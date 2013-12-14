@@ -41,6 +41,11 @@ func (item *JsonItem) WriteSafeString(s string) int {
   return item.writeString(s, true)
 }
 
+func (item *JsonItem) Write(b []byte) int {
+  n, _ := item.Item.Write(b)
+  return item.delimit(n)
+}
+
 func (item *JsonItem) WriteKeyString(key, value string) int {
   return item.WriteKeySafeString(key, JsonEncode(value))
 }

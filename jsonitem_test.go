@@ -73,6 +73,19 @@ func TestJsonWritesAnEmptyObject(t *testing.T) {
   }
 }
 
+func TestJsonWritesADelimitedByte(t *testing.T) {
+  expected := `["abc","123"]`
+  item := newJsonItem(100, nil)
+  item.BeginArray()
+  item.Write([]byte(`"abc"`))
+  item.Write([]byte(`"123"`))
+  item.EndArray()
+  actual := item.String()
+  if actual != expected {
+    t.Errorf("Expecting %q, got %q", expected, actual)
+  }
+}
+
 func TestJsonASingleValueObject(t *testing.T) {
   expected := `{"over":"90\"00!"}`
   item := newJsonItem(100, nil)

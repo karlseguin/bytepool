@@ -13,14 +13,25 @@ type Pool struct {
 }
 
 func New(count int, capacity int) *Pool {
-	p := &Pool{
+	pool := &Pool{
 		capacity: capacity,
 		list:     make(chan *Item, count),
 	}
-	for i := 0; i < count; i++ {
-		p.list <- newItem(capacity, p)
-	}
-	return p
+	pool.populate()
+	return pool
+}
+
+// not thread safe, just here to make fluent-configs a little cleaner
+func (pool *Pool) SetCapacity(capacity int) {
+	pool.capacity = capacity
+	pool.list = make(chan *Item, len(pool.list))
+	pool.populate()
+}
+
+// not thread safe, just here to make fluent-configs a little cleaner
+func (pool *Pool) SetCount(count int) {
+	pool.list = make(chan *Item, count)
+	pool.populate()
 }
 
 func (pool *Pool) Checkout() *Item {
@@ -40,4 +51,10 @@ func (pool *Pool) Len() int {
 
 func (pool *Pool) Misses() int32 {
 	return atomic.LoadInt32(&pool.misses)
+}
+
+func (pool *Pool) populate() {
+	for i := 0; i < cap(pool.list); i++ {
+		pool.list <- newItem(pool.capacity, pool)
+	}
 }

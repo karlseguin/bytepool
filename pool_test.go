@@ -15,6 +15,43 @@ func TestPoolEachItemIsOfASpecifiedSize(t *testing.T) {
 	}
 }
 
+func TestPoolHasTheSpecifiedNumberOfItems(t *testing.T) {
+	expected := 3
+	p := New(expected, 4)
+	if cap(p.list) != expected {
+		t.Errorf("expecting a pool with %d items, got %d", expected, cap(p.list))
+	}
+}
+
+func TestPoolHasTheSpecifiedNumberOfItemsAfterACulling(t *testing.T) {
+	expected := 2
+	p := New(5, 4)
+	p.SetCount(expected)
+	if cap(p.list) != expected {
+		t.Errorf("expecting a pool with %d items, got %d", expected, cap(p.list))
+	}
+}
+
+func TestPoolHasTheSpecifiedNumberOfItemsAfterAddition(t *testing.T) {
+	expected := 10
+	p := New(5, 4)
+	p.SetCount(expected)
+	if cap(p.list) != expected {
+		t.Errorf("expecting a pool with %d items, got %d", expected, cap(p.list))
+	}
+}
+
+func TestPoolEachItemIsOfASpecifiedSizeAfterResize(t *testing.T) {
+	expected := 11
+	p := New(1, 5)
+	p.SetCapacity(expected)
+	item := p.Checkout()
+	defer item.Close()
+	if cap(item.bytes) != expected {
+		t.Errorf("expecting array to have a capacity of %d, got %d", expected, cap(item.bytes))
+	}
+}
+
 func TestPoolDynamicallyCreatesAnItemWhenPoolIsEmpty(t *testing.T) {
 	p := New(1, 2)
 	item1 := p.Checkout()

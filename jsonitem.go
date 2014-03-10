@@ -3,6 +3,7 @@ package bytepool
 import (
 	"strconv"
 	"strings"
+	"time"
 )
 
 type JsonItem struct {
@@ -60,6 +61,10 @@ func (item *JsonItem) WriteKeyInt(key string, value int) int {
 
 func (item *JsonItem) WriteKeyBool(key string, value bool) int {
 	return item.writeKeyValue(key, strconv.FormatBool(value))
+}
+
+func (item *JsonItem) WriteKeyTime(key string, value time.Time) int {
+	return item.writeKeyValue(key, value.Format(time.RFC3339Nano))
 }
 
 func (item *JsonItem) WriteKeyArray(key string) int {

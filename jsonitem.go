@@ -115,7 +115,9 @@ func (item *JsonItem) BeginArray() bool {
 func (item *JsonItem) EndArray() bool {
 	item.depth--
 	item.TrimLastIf(',')
-	return item.WriteByte(']')
+	item.WriteByte(']')
+	item.delimit(0)
+	return true
 }
 
 func (item *JsonItem) BeginObject() bool {
@@ -126,7 +128,9 @@ func (item *JsonItem) BeginObject() bool {
 func (item *JsonItem) EndObject() bool {
 	item.depth--
 	item.TrimLastIf(',')
-	return item.WriteByte('}')
+	item.WriteByte('}')
+	item.delimit(0)
+	return true
 }
 
 func (item *JsonItem) delimit(length int) int {

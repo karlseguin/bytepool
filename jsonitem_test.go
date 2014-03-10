@@ -112,6 +112,26 @@ func TestJsonAMultiValueObject(t *testing.T) {
 	}
 }
 
+func TestWriteMultipleKeyObjects(t *testing.T) {
+	expected := `{"name":{"en":"leto"},"desc":{"en":"worm"}}`
+	item := newJsonItem(100, nil)
+	item.BeginObject()
+
+	item.WriteKeyObject("name")
+	item.WriteKeyString("en", "leto")
+	item.EndObject()
+
+	item.WriteKeyObject("desc")
+	item.WriteKeyString("en", "worm")
+	item.EndObject()
+
+	item.EndObject()
+	actual := item.String()
+	if actual != expected {
+		t.Errorf("Expecting %q, got %q", expected, actual)
+	}
+}
+
 func TestJsonNestedObjects(t *testing.T) {
 	expected := `[1,{"name":"goku","levels":[2,{"over":{"9000":"!"}}]}]`
 	item := newJsonItem(100, nil)

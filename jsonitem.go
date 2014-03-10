@@ -64,7 +64,7 @@ func (item *JsonItem) WriteKeyBool(key string, value bool) int {
 }
 
 func (item *JsonItem) WriteKeyTime(key string, value time.Time) int {
-	return item.writeKeyValue(key, value.Format(time.RFC3339Nano))
+	return item.WriteKeySafeString(key, value.Format(time.RFC3339Nano))
 }
 
 func (item *JsonItem) WriteKeyArray(key string) int {

@@ -21,7 +21,7 @@ func newJsonItem(capacity int, pool *JsonPool) *JsonItem {
 }
 
 var JsonEncode = func(s string) string {
-	return strings.Replace(s, `"`, `\"`, -1)
+	return strings.Replace(strings.Replace(s, `"`, `\"`, -1), "\n", "\\n", -1)
 }
 
 func (item *JsonItem) WriteString(s string) int {

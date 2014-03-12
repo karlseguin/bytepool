@@ -244,3 +244,15 @@ func TestReadDoesNotAutomaticallyRewind(t *testing.T) {
 		t.Errorf("expecting to have read hello, got %v", string(b[0:5]))
 	}
 }
+
+func TestCloneDetachesTheObject(t *testing.T) {
+	expected := "over"
+	item := newItem(10, nil)
+	item.WriteString("over")
+	actual := item.Clone()
+	item.Raw()[0] = '!'
+
+	if string(actual) != expected {
+		t.Errorf("Expecting %q, got %q", expected, string(actual))
+	}
+}

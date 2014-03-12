@@ -76,6 +76,12 @@ func (item *Item) Bytes() []byte {
 	return item.bytes[0:item.length]
 }
 
+func (item *Item) Clone() []byte {
+	b := make([]byte, item.length)
+	copy(b, item.Bytes())
+	return b
+}
+
 func (item *Item) Raw() []byte {
 	return item.bytes
 }

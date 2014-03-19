@@ -9,7 +9,6 @@ import (
 type JsonItem struct {
 	*Item
 	depth int
-	added bool
 	pool  *JsonPool
 }
 
@@ -107,7 +106,6 @@ func (item *JsonItem) writeString(s string, delimit bool) int {
 }
 
 func (item *JsonItem) BeginArray() bool {
-	item.added = false
 	item.depth++
 	return item.WriteByte('[')
 }
@@ -144,6 +142,7 @@ func (item *JsonItem) delimit(length int) int {
 func (item *JsonItem) Close() error {
 	item.Item.Close()
 	if item.pool != nil {
+		item.depth = 0
 		item.pool.list <- item
 	}
 	return nil

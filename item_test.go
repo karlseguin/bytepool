@@ -112,8 +112,9 @@ func TestCanSetThePosition(t *testing.T) {
 	}
 }
 
-func TestCloseResetsTheLength(t *testing.T) {
-	item := newItem(100, nil)
+func TestCloseResetsTheLengthWhenAttachedToApool(t *testing.T) {
+	pool := New(1, 100)
+	item := pool.Checkout()
 	item.WriteString("hello world")
 	item.Close()
 	if item.Len() != 0 {

@@ -140,9 +140,11 @@ func (item *JsonItem) delimit(length int) int {
 }
 
 func (item *JsonItem) Close() error {
-	item.Item.Close()
 	if item.pool != nil {
+		item.pool.track(int64(item.length))
+		item.read = 0
 		item.depth = 0
+		item.length = 0
 		item.pool.list <- item
 	}
 	return nil

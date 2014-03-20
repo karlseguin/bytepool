@@ -120,9 +120,10 @@ func (item *Item) Drained() bool {
 }
 
 func (item *Item) Close() error {
-	item.length = 0
-	item.read = 0
 	if item.pool != nil {
+		item.pool.track(int64(item.length))
+		item.read = 0
+		item.length = 0
 		item.pool.list <- item
 	}
 	return nil

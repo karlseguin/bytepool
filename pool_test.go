@@ -71,8 +71,8 @@ func TestPoolDynamicallyCreatesAnItemWhenPoolIsEmpty(t *testing.T) {
 	if p.Misses() != 1 {
 		t.Errorf("Expecting a miss count of 1, got %d", p.Misses())
 	}
-
 }
+
 func TestPoolReleasesAnItemBackIntoThePool(t *testing.T) {
 	p := New(1, 20)
 	item1 := p.Checkout()
@@ -83,5 +83,49 @@ func TestPoolReleasesAnItemBackIntoThePool(t *testing.T) {
 	defer item2.Close()
 	if reflect.ValueOf(item2).Pointer() != pointer {
 		t.Error("Pool returned an unexected item")
+	}
+}
+
+func TestPoolStatsTracksAndResetMisses(t *testing.T) {
+	p := New(1, 1)
+	p.Checkout()
+	p.Checkout()
+	p.Checkout()
+
+	misses := p.Stats()["misses"]
+	if misses != 2 {
+		t.Errorf("Expected 2 misses, got %d", misses)
+	}
+
+	//calling stats should reset this
+	misses = p.Stats()["misses"]
+	if misses != 0 {
+		t.Errorf("Expected 0 misses, got %d", misses)
+	}
+}
+
+func TestPoolStatsTracksAndResetsMax(t *testing.T) {
+	p := New(1, 20)
+	item := p.Checkout()
+	item.WriteString("abc")
+	item.Close()
+
+	item = p.Checkout()
+	item.WriteString("abc123")
+	item.Close()
+
+	item = p.Checkout()
+	item.WriteString("abc2")
+	item.Close()
+
+	max := p.Stats()["max"]
+	if max != 6 {
+		t.Errorf("Expected 6 max, got %d", max)
+	}
+
+	//calling stats should reset this
+	max = p.Stats()["max"]
+	if max != 0 {
+		t.Errorf("Expected 0 max, got %d", max)
 	}
 }

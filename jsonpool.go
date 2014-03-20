@@ -7,15 +7,18 @@ import (
 )
 
 type JsonPool struct {
-	misses   int32
+	misses   int64
+	maxBytes int64
 	capacity int
 	list     chan *JsonItem
+	stats    map[string]int64
 }
 
 func NewJson(count int, capacity int) *JsonPool {
 	p := &JsonPool{
 		capacity: capacity,
 		list:     make(chan *JsonItem, count),
+		stats:    map[string]int64{"misses": 0, "max": 0},
 	}
 	for i := 0; i < count; i++ {
 		p.list <- newJsonItem(capacity, p)
@@ -28,7 +31,7 @@ func (pool *JsonPool) Checkout() *JsonItem {
 	select {
 	case item = <-pool.list:
 	default:
-		atomic.AddInt32(&pool.misses, 1)
+		atomic.AddInt64(&pool.misses, 1)
 		item = newJsonItem(pool.capacity, nil)
 	}
 	return item
@@ -38,6 +41,18 @@ func (pool *JsonPool) Len() int {
 	return len(pool.list)
 }
 
-func (pool *JsonPool) Misses() int32 {
-	return atomic.LoadInt32(&pool.misses)
+func (pool *JsonPool) Misses() int64 {
+	return atomic.LoadInt64(&pool.misses)
+}
+
+func (pool *JsonPool) track(length int64) {
+	if length > atomic.LoadInt64(&pool.maxBytes) {
+		atomic.StoreInt64(&pool.maxBytes, length)
+	}
+}
+
+func (pool *JsonPool) Stats() map[string]int64 {
+	pool.stats["misses"] = atomic.SwapInt64(&pool.misses, 0)
+	pool.stats["max"] = atomic.SwapInt64(&pool.maxBytes, 0)
+	return pool.stats
 }

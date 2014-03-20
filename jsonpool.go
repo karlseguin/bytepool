@@ -55,7 +55,7 @@ func (pool *JsonPool) track(length int64) {
 	if length > atomic.LoadInt64(&pool.maxBytes) {
 		atomic.StoreInt64(&pool.maxBytes, length)
 	}
-	atomic.AddInt64(&pool.maxTaken, -1)
+	atomic.AddInt64(&pool.taken, -1)
 }
 
 func (pool *JsonPool) Stats() map[string]int64 {

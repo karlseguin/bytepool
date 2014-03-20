@@ -92,3 +92,21 @@ func TestJsonPoolStatsTracksAndResetsMax(t *testing.T) {
 		t.Errorf("Expected 0 max, got %d", max)
 	}
 }
+
+func TestJsonPoolStatsTracksAndResetTaken(t *testing.T) {
+	p := NewJson(10, 1)
+	p.Checkout()
+	p.Checkout()
+	p.Checkout()
+
+	taken := p.Stats()["taken"]
+	if taken != 3 {
+		t.Errorf("Expected 3 misses, got %d", taken)
+	}
+
+	//calling stats should reset this
+	taken = p.Stats()["taken"]
+	if taken != 0 {
+		t.Errorf("Expected 0 taken, got %d", taken)
+	}
+}

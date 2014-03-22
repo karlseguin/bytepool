@@ -103,6 +103,12 @@ func (item *Item) TrimLastIf(b byte) bool {
 	return true
 }
 
+func (item *Item) Last(b byte) {
+	if l := item.Len(); l > 0 {
+		item.bytes[l-1] = b
+	}
+}
+
 func (item *Item) Position(position int) bool {
 	if position < 0 || position > cap(item.bytes) {
 		return false

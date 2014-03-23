@@ -6,7 +6,7 @@ import (
 
 func TestJsonCanWriteAnEncodedString(t *testing.T) {
 	expected := `"over \"9000\""`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.WriteString(`over "9000"`)
 	actual := item.String()
 	if actual != expected {
@@ -16,7 +16,7 @@ func TestJsonCanWriteAnEncodedString(t *testing.T) {
 
 func TestJsonCanWriteAString(t *testing.T) {
 	expected := `"over "9000""`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.WriteSafeString(`over "9000"`)
 	actual := item.String()
 	if actual != expected {
@@ -26,7 +26,7 @@ func TestJsonCanWriteAString(t *testing.T) {
 
 func TestJsonWritesAnEmptyArray(t *testing.T) {
 	expected := "[]"
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.EndArray()
 	actual := item.String()
@@ -37,7 +37,7 @@ func TestJsonWritesAnEmptyArray(t *testing.T) {
 
 func TestJsonWritesASingleValueArray(t *testing.T) {
 	expected := "[90]"
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(90)
 	item.EndArray()
@@ -49,7 +49,7 @@ func TestJsonWritesASingleValueArray(t *testing.T) {
 
 func TestJsonWritesAMultiValueArray(t *testing.T) {
 	expected := `[90,false,"abc",true]`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(90)
 	item.WriteBool(false)
@@ -64,7 +64,7 @@ func TestJsonWritesAMultiValueArray(t *testing.T) {
 
 func TestJsonWritesAnEmptyObject(t *testing.T) {
 	expected := `{}`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.EndObject()
 	actual := item.String()
@@ -75,7 +75,7 @@ func TestJsonWritesAnEmptyObject(t *testing.T) {
 
 func TestJsonWritesADelimitedByte(t *testing.T) {
 	expected := `["abc","123"]`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.Write([]byte(`"abc"`))
 	item.Write([]byte(`"123"`))
@@ -88,7 +88,7 @@ func TestJsonWritesADelimitedByte(t *testing.T) {
 
 func TestJsonASingleValueObject(t *testing.T) {
 	expected := `{"over":"90\"00!"}`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.WriteKeyString("over", "90\"00!")
 	item.EndObject()
@@ -100,7 +100,7 @@ func TestJsonASingleValueObject(t *testing.T) {
 
 func TestJsonAMultiValueObject(t *testing.T) {
 	expected := `{"name":"goku","power":9000,"over":true}`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.WriteKeySafeString("name", "goku")
 	item.WriteKeyInt("power", 9000)
@@ -114,7 +114,7 @@ func TestJsonAMultiValueObject(t *testing.T) {
 
 func TestWriteMultipleKeyObjects(t *testing.T) {
 	expected := `{"name":{"en":"leto"},"desc":{"en":"worm"}}`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginObject()
 
 	item.WriteKeyObject("name")
@@ -134,7 +134,7 @@ func TestWriteMultipleKeyObjects(t *testing.T) {
 
 func TestJsonNestedObjects(t *testing.T) {
 	expected := `[1,{"name":"goku","levels":[2,{"over":{"9000":"!"}}]}]`
-	item := newJsonItem(100, nil)
+	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(1)
 	item.BeginObject()

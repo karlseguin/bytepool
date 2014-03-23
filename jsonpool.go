@@ -23,7 +23,7 @@ func NewJson(count int, capacity int) *JsonPool {
 		stats:    map[string]int64{"misses": 0, "max": 0},
 	}
 	for i := 0; i < count; i++ {
-		p.list <- newJsonItem(capacity, p)
+		p.list <- NewJsonItem(capacity, p)
 	}
 	return p
 }
@@ -38,7 +38,7 @@ func (pool *JsonPool) Checkout() *JsonItem {
 		}
 	default:
 		atomic.AddInt64(&pool.misses, 1)
-		item = newJsonItem(pool.capacity, nil)
+		item = NewJsonItem(pool.capacity, nil)
 	}
 	return item
 }

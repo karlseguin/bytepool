@@ -11,7 +11,7 @@ type Item struct {
 	bytes  []byte
 }
 
-func newItem(capacity int, pool *Pool) *Item {
+func NewItem(capacity int, pool *Pool) *Item {
 	return &Item{
 		pool:  pool,
 		bytes: make([]byte, capacity),

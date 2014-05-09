@@ -49,7 +49,7 @@ func (pool *Pool) Checkout() *Item {
 		}
 	default:
 		atomic.AddInt64(&pool.misses, 1)
-		item = newItem(pool.capacity, nil)
+		item = NewItem(pool.capacity, nil)
 	}
 	return item
 }
@@ -64,7 +64,7 @@ func (pool *Pool) Misses() int64 {
 
 func (pool *Pool) populate() {
 	for i := 0; i < cap(pool.list); i++ {
-		pool.list <- newItem(pool.capacity, pool)
+		pool.list <- NewItem(pool.capacity, pool)
 	}
 }
 

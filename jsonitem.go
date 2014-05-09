@@ -15,7 +15,7 @@ type JsonItem struct {
 func NewJsonItem(capacity int, pool *JsonPool) *JsonItem {
 	return &JsonItem{
 		pool: pool,
-		Item: newItem(capacity, nil),
+		Item: NewItem(capacity, nil),
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 
 func TestCanWriteAString(t *testing.T) {
 	expected := "over 9000"
-	item := newItem(10, nil)
+	item := NewItem(10, nil)
 	item.WriteString("over ")
 	item.WriteString("9000")
 	actual := item.String()
@@ -20,7 +20,7 @@ func TestCanWriteAString(t *testing.T) {
 
 func TestCanWriteAByteArray(t *testing.T) {
 	expected := []byte("the spice must flow")
-	item := newItem(60, nil)
+	item := NewItem(60, nil)
 	item.Write([]byte("the "))
 	item.Write([]byte("spice "))
 	item.Write([]byte("must "))
@@ -34,7 +34,7 @@ func TestCanWriteAByteArray(t *testing.T) {
 
 func TestWriteAByte(t *testing.T) {
 	expected := []byte("the sp")
-	item := newItem(60, nil)
+	item := NewItem(60, nil)
 	item.Write([]byte("the "))
 	item.WriteByte(byte('s'))
 	item.WriteByte(byte('p'))
@@ -47,7 +47,7 @@ func TestWriteAByte(t *testing.T) {
 
 func TestDoesNotWriteAByteWhenFull(t *testing.T) {
 	expected := []byte("the s")
-	item := newItem(5, nil)
+	item := NewItem(5, nil)
 	item.Write([]byte("the "))
 	item.WriteByte(byte('s'))
 	item.WriteByte(byte('p'))
@@ -60,7 +60,7 @@ func TestDoesNotWriteAByteWhenFull(t *testing.T) {
 
 func TestHAndlesReadingAnExactSize(t *testing.T) {
 	expected := "12345"
-	item := newItem(5, nil)
+	item := NewItem(5, nil)
 	buffer := bytes.NewBufferString(expected)
 	item.ReadFrom(buffer)
 
@@ -71,7 +71,7 @@ func TestHAndlesReadingAnExactSize(t *testing.T) {
 
 func TestCanWriteFromAReader(t *testing.T) {
 	expected := []byte("I am in a reader")
-	item := newItem(60, nil)
+	item := NewItem(60, nil)
 	n, _ := item.ReadFrom(bytes.NewBuffer(expected))
 	actual := item.Bytes()
 
@@ -86,7 +86,7 @@ func TestCanWriteFromAReader(t *testing.T) {
 func TestCanWriteFromMultipleSources(t *testing.T) {
 	expected := []byte("startI am in a readerend")
 	bufferContent := []byte("I am in a reader")
-	item := newItem(100, nil)
+	item := NewItem(100, nil)
 	item.Write([]byte("start"))
 	n, _ := item.ReadFrom(bytes.NewBuffer(bufferContent))
 	item.WriteString("end")
@@ -102,7 +102,7 @@ func TestCanWriteFromMultipleSources(t *testing.T) {
 
 func TestCanSetThePosition(t *testing.T) {
 	expected := "hello."
-	item := newItem(100, nil)
+	item := NewItem(100, nil)
 	item.WriteString("hello world")
 	item.Position(5)
 	item.WriteString(".")
@@ -131,7 +131,7 @@ func TestCloseResetsTheLengthWhenAttachedToApool(t *testing.T) {
 
 func TestCannotSetThePositionToANegativeValue(t *testing.T) {
 	expected := "hello world."
-	item := newItem(25, nil)
+	item := NewItem(25, nil)
 	item.WriteString("hello world")
 	item.Position(-10)
 	item.WriteString(".")
@@ -143,7 +143,7 @@ func TestCannotSetThePositionToANegativeValue(t *testing.T) {
 
 func TestCannotSetThePositionBeyondTheLength(t *testing.T) {
 	expected := "hello world."
-	item := newItem(25, nil)
+	item := NewItem(25, nil)
 	item.WriteString("hello world")
 	item.Position(30)
 	item.WriteString(".")
@@ -155,7 +155,7 @@ func TestCannotSetThePositionBeyondTheLength(t *testing.T) {
 
 func TestTrimLastIfTrimsOnMatch(t *testing.T) {
 	expected := "hello world"
-	item := newItem(25, nil)
+	item := NewItem(25, nil)
 	item.WriteString("hello world.")
 	r := item.TrimLastIf(byte('.'))
 	if r != true {
@@ -168,7 +168,7 @@ func TestTrimLastIfTrimsOnMatch(t *testing.T) {
 
 func TestTrimLastIfTrimsOnNoMatch(t *testing.T) {
 	expected := "hello world."
-	item := newItem(25, nil)
+	item := NewItem(25, nil)
 	item.WriteString("hello world.")
 	r := item.TrimLastIf(byte(','))
 	if r != false {
@@ -181,7 +181,7 @@ func TestTrimLastIfTrimsOnNoMatch(t *testing.T) {
 
 func TestTruncatesTheContentToTheLength(t *testing.T) {
 	expected := "hell"
-	item := newItem(4, nil)
+	item := NewItem(4, nil)
 	item.WriteString("hello")
 	actual := item.String()
 	if actual != expected {
@@ -197,7 +197,7 @@ func TestTruncatesTheContentToTheLength(t *testing.T) {
 
 func TestCanReadIntoVariousSizedByteArray(t *testing.T) {
 	for size, expected := range map[int]string{3: "hel", 5: "hello", 7: "hello\x00\x00"} {
-		item := newItem(5, nil)
+		item := NewItem(5, nil)
 		item.WriteString("hello")
 		target := make([]byte, size)
 		item.Read(target)
@@ -208,7 +208,7 @@ func TestCanReadIntoVariousSizedByteArray(t *testing.T) {
 }
 
 func TestReadDoesNotAutomaticallyRewind(t *testing.T) {
-	item := newItem(5, nil)
+	item := NewItem(5, nil)
 	item.WriteString("hello")
 	b := make([]byte, 5)
 
@@ -248,7 +248,7 @@ func TestReadDoesNotAutomaticallyRewind(t *testing.T) {
 
 func TestCloneDetachesTheObject(t *testing.T) {
 	expected := "over"
-	item := newItem(10, nil)
+	item := NewItem(10, nil)
 	item.WriteString("over")
 	actual := item.Clone()
 	item.Raw()[0] = '!'

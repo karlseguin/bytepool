@@ -72,6 +72,10 @@ func (item *Item) Read(p []byte) (int, error) {
 	return n, nil
 }
 
+func (item *Item) At(i int) byte {
+	return item.bytes[i]
+}
+
 func (item *Item) Bytes() []byte {
 	return item.bytes[0:item.length]
 }

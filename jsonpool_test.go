@@ -3,40 +3,36 @@ package bytepool
 import (
 	"reflect"
 	"testing"
+	. "github.com/karlseguin/expect"
 )
 
-func TestJsonPoolEachItemIsOfASpecifiedSize(t *testing.T) {
-	expected := 9
-	p := NewJson(1, expected)
-	item := p.Checkout()
-	defer item.Close()
-	if cap(item.bytes) != expected {
-		t.Errorf("expecting array to have a capacity of %d, got %d", expected, cap(item.bytes))
-	}
+type JsonPoolTests struct{}
+
+func Test_JsonPool(t *testing.T) {
+	Expectify(new(JsonPoolTests), t)
 }
 
-func TestJsonPoolDynamicallyCreatesAnItemWhenPoolIsEmpty(t *testing.T) {
+func (j *JsonPoolTests) EachItemIsOfASpecifiedSize() {
+	p := NewJson(1, 9)
+	item := p.Checkout()
+	defer item.Close()
+	Expect(cap(item.bytes)).To.Equal(9)
+}
+
+func (j *JsonPoolTests) DynamicallyCreatesAnItemWhenPoolIsEmpty() {
 	p := NewJson(1, 2)
 	item1 := p.Checkout()
 	item2 := p.Checkout()
-	if cap(item2.bytes) != 2 {
-		t.Error("Dynamically created item was not properly initialized")
-	}
-	if item2.pool != nil {
-		t.Error("The dynamically created item should have a nil pool")
-	}
+	Expect(cap(item2.bytes)).To.Equal(2)
+	Expect(item2.pool).To.Equal(nil)
 
 	item1.Close()
 	item2.Close()
-	if p.Len() != 1 {
-		t.Errorf("Expecting a pool lenght of 1, got %d", p.Len())
-	}
-	if p.Misses() != 1 {
-		t.Errorf("Expecting a miss count of 1, got %d", p.Misses())
-	}
-
+	Expect(p.Len()).To.Equal(1)
+	Expect(p.Misses()).To.Equal(int64(1))
 }
-func TestJsonPoolReleasesAnItemBackIntoThePool(t *testing.T) {
+
+func (j *JsonPoolTests) ReleasesAnItemBackIntoThePool() {
 	p := NewJson(1, 20)
 	item1 := p.Checkout()
 	pointer := reflect.ValueOf(item1).Pointer()
@@ -44,30 +40,23 @@ func TestJsonPoolReleasesAnItemBackIntoThePool(t *testing.T) {
 
 	item2 := p.Checkout()
 	defer item2.Close()
+
 	if reflect.ValueOf(item2).Pointer() != pointer {
-		t.Error("Pool returned an unexected item")
+		Fail("Pool returned an unexected item")
 	}
 }
 
-func TestJsonPoolStatsTracksAndResetMisses(t *testing.T) {
+func (j *JsonPoolTests) StatsTracksAndResetMisses() {
 	p := NewJson(1, 1)
 	p.Checkout()
 	p.Checkout()
 	p.Checkout()
-
-	misses := p.Stats()["misses"]
-	if misses != 2 {
-		t.Errorf("Expected 2 misses, got %d", misses)
-	}
-
+	Expect(p.Stats()["misses"]).To.Equal(int64(2))
 	//calling stats should reset this
-	misses = p.Stats()["misses"]
-	if misses != 0 {
-		t.Errorf("Expected 0 misses, got %d", misses)
-	}
+	Expect(p.Stats()["misses"]).To.Equal(int64(0))
 }
 
-func TestJsonPoolStatsTracksAndResetsMax(t *testing.T) {
+func (j *JsonPoolTests) StatsTracksAndResetsMax() {
 	p := NewJson(1, 20)
 	item := p.Checkout()
 	item.WriteString("abc")
@@ -81,32 +70,18 @@ func TestJsonPoolStatsTracksAndResetsMax(t *testing.T) {
 	item.WriteString("abc2")
 	item.Close()
 
-	max := p.Stats()["max"]
-	if max != 8 {
-		t.Errorf("Expected 8 max, got %d", max)
-	}
-
+	Expect(p.Stats()["max"]).To.Equal(int64(8))
 	//calling stats should reset this
-	max = p.Stats()["max"]
-	if max != 0 {
-		t.Errorf("Expected 0 max, got %d", max)
-	}
+	Expect(p.Stats()["max"]).To.Equal(int64(0))
 }
 
-func TestJsonPoolStatsTracksAndResetTaken(t *testing.T) {
+func (j *JsonPoolTests) StatsTracksAndResetTaken() {
 	p := NewJson(10, 1)
 	p.Checkout()
 	p.Checkout()
 	p.Checkout()
 
-	taken := p.Stats()["taken"]
-	if taken != 3 {
-		t.Errorf("Expected 3 misses, got %d", taken)
-	}
-
+	Expect(p.Stats()["taken"]).To.Equal(int64(3))
 	//calling stats should reset this
-	taken = p.Stats()["taken"]
-	if taken != 0 {
-		t.Errorf("Expected 0 taken, got %d", taken)
-	}
+	Expect(p.Stats()["taken"]).To.Equal(int64(0))
 }

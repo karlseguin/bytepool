@@ -4,256 +4,163 @@ import (
 	"bytes"
 	"io"
 	"testing"
+	. "github.com/karlseguin/expect"
 )
 
-func TestCanWriteAString(t *testing.T) {
-	expected := "over 9000"
+type ItemTests struct {}
+
+func Test_Items(t *testing.T) {
+	Expectify(new(ItemTests), t)
+}
+
+func (i *ItemTests) CanWriteAString() {
 	item := NewItem(10, nil)
 	item.WriteString("over ")
 	item.WriteString("9000")
-	actual := item.String()
-
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("over 9000")
 }
 
-func TestCanWriteAByteArray(t *testing.T) {
-	expected := []byte("the spice must flow")
+func (i *ItemTests) CanWriteAByteArray() {
 	item := NewItem(60, nil)
 	item.Write([]byte("the "))
 	item.Write([]byte("spice "))
 	item.Write([]byte("must "))
 	item.Write([]byte("flow"))
-	actual := item.Bytes()
-
-	if bytes.Compare(actual, expected) != 0 {
-		t.Errorf("Expecting %v, got %v", expected, actual)
-	}
+	Expect(item.Bytes()).To.Equal([]byte("the spice must flow"))
 }
 
-func TestWriteAByte(t *testing.T) {
-	expected := []byte("the sp")
+func (i *ItemTests) WriteAByte() {
 	item := NewItem(60, nil)
 	item.Write([]byte("the "))
 	item.WriteByte(byte('s'))
 	item.WriteByte(byte('p'))
-	actual := item.Bytes()
-
-	if bytes.Compare(actual, expected) != 0 {
-		t.Errorf("Expecting %v, got %v", expected, actual)
-	}
+	Expect(item.Bytes()).To.Equal([]byte("the sp"))
 }
 
-func TestDoesNotWriteAByteWhenFull(t *testing.T) {
-	expected := []byte("the s")
+func (i *ItemTests) DoesNotWriteAByteWhenFull() {
 	item := NewItem(5, nil)
 	item.Write([]byte("the "))
 	item.WriteByte(byte('s'))
 	item.WriteByte(byte('p'))
-	actual := item.Bytes()
-
-	if bytes.Compare(actual, expected) != 0 {
-		t.Errorf("Expecting %v, got %v", expected, actual)
-	}
+	Expect(item.Bytes()).To.Equal([]byte("the s"))
 }
 
-func TestHAndlesReadingAnExactSize(t *testing.T) {
-	expected := "12345"
+func (i *ItemTests) HAndlesReadingAnExactSize() {
 	item := NewItem(5, nil)
-	buffer := bytes.NewBufferString(expected)
+	buffer := bytes.NewBufferString("12345")
 	item.ReadFrom(buffer)
 
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(item.String()).To.Equal("12345")
 }
 
-func TestCanWriteFromAReader(t *testing.T) {
-	expected := []byte("I am in a reader")
+func (i *ItemTests) CanWriteFromAReader() {
 	item := NewItem(60, nil)
-	n, _ := item.ReadFrom(bytes.NewBuffer(expected))
-	actual := item.Bytes()
-
-	if bytes.Compare(actual, expected) != 0 {
-		t.Errorf("Expecting %v, got %v", expected, actual)
-	}
-	if int(n) != len(expected) {
-		t.Errorf("Expecting length of %v, got %v", len(expected), n)
-	}
+	n, _ := item.ReadFrom(bytes.NewBuffer([]byte("I am in a reader")))
+	Expect(item.Bytes()).To.Equal([]byte("I am in a reader"))
+	Expect(int(n)).To.Equal(len("I am in a reader"))
 }
 
-func TestCanWriteFromMultipleSources(t *testing.T) {
-	expected := []byte("startI am in a readerend")
-	bufferContent := []byte("I am in a reader")
+func (i *ItemTests) WriteFromMultipleSources() {
 	item := NewItem(100, nil)
 	item.Write([]byte("start"))
-	n, _ := item.ReadFrom(bytes.NewBuffer(bufferContent))
+	n, _ := item.ReadFrom(bytes.NewBuffer([]byte("I am in a reader")))
 	item.WriteString("end")
-	actual := item.Bytes()
 
-	if bytes.Compare(actual, expected) != 0 {
-		t.Errorf("Expecting %v, got %v", expected, actual)
-	}
-	if int(n) != len(bufferContent) {
-		t.Errorf("Expecting length of %v, got %v", len(bufferContent), n)
-	}
+	Expect(item.Bytes()).To.Equal([]byte("startI am in a readerend"))
+	Expect(int(n)).To.Equal(len([]byte("I am in a reader")))
 }
 
-func TestCanSetThePosition(t *testing.T) {
-	expected := "hello."
+func (i *ItemTests) CanSetThePosition() {
 	item := NewItem(100, nil)
 	item.WriteString("hello world")
 	item.Position(5)
 	item.WriteString(".")
-
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(item.String()).To.Equal("hello.")
 }
 
-func TestCloseResetsTheLengthWhenAttachedToApool(t *testing.T) {
+func (i *ItemTests) CloseResetsTheLengthWhenAttachedToApool() {
 	pool := New(1, 100)
 	item := pool.Checkout()
 	item.WriteString("hello world")
 	item.Close()
-	if item.Len() != 0 {
-		t.Errorf("Expecting length of 0, got %v", item.Len())
-	}
+	Expect(item.Len()).To.Equal(0)
 	item.WriteString("hello")
-
-	expected := "hello"
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("hello")
 }
 
-func TestCannotSetThePositionToANegativeValue(t *testing.T) {
-	expected := "hello world."
+func (i *ItemTests) CannotSetThePositionToANegativeValue() {
 	item := NewItem(25, nil)
 	item.WriteString("hello world")
 	item.Position(-10)
 	item.WriteString(".")
-
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(item.String()).To.Equal("hello world.")
 }
 
-func TestCannotSetThePositionBeyondTheLength(t *testing.T) {
-	expected := "hello world."
+func (i *ItemTests) CannotSetThePositionBeyondTheLength() {
 	item := NewItem(25, nil)
 	item.WriteString("hello world")
 	item.Position(30)
 	item.WriteString(".")
-
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(item.String()).To.Equal("hello world.")
 }
 
-func TestTrimLastIfTrimsOnMatch(t *testing.T) {
-	expected := "hello world"
+func (i *ItemTests) TrimLastIfTrimsOnMatch() {
 	item := NewItem(25, nil)
 	item.WriteString("hello world.")
 	r := item.TrimLastIf(byte('.'))
-	if r != true {
-		t.Error("Expecting TrimLastIf to return true")
-	}
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(r).To.Equal(true)
+	Expect(item.String()).To.Equal("hello world")
 }
 
-func TestTrimLastIfTrimsOnNoMatch(t *testing.T) {
-	expected := "hello world."
+func (i *ItemTests) TrimLastIfTrimsOnNoMatch() {
 	item := NewItem(25, nil)
 	item.WriteString("hello world.")
 	r := item.TrimLastIf(byte(','))
-	if r != false {
-		t.Error("Expecting TrimLastIf to return false")
-	}
-	if item.String() != expected {
-		t.Errorf("Expecting %v, got %v", expected, item.String())
-	}
+	Expect(r).To.Equal(false)
+	Expect(item.String()).To.Equal("hello world.")
 }
 
-func TestTruncatesTheContentToTheLength(t *testing.T) {
-	expected := "hell"
+func (i *ItemTests) TruncatesTheContentToTheLength() {
 	item := NewItem(4, nil)
 	item.WriteString("hello")
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
-
+	Expect(item.String()).To.Equal("hell")
 	item.WriteString("world")
-	actual = item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("hell")
 }
 
-func TestCanReadIntoVariousSizedByteArray(t *testing.T) {
+func (i *ItemTests) CanReadIntoVariousSizedByteArray() {
 	for size, expected := range map[int]string{3: "hel", 5: "hello", 7: "hello\x00\x00"} {
 		item := NewItem(5, nil)
 		item.WriteString("hello")
 		target := make([]byte, size)
 		item.Read(target)
-		if string(target) != expected {
-			t.Errorf("Expecting %q, got %q", expected, string(target))
-		}
+		Expect(string(target)).To.Equal(expected)
 	}
 }
 
-func TestReadDoesNotAutomaticallyRewind(t *testing.T) {
+func (i *ItemTests) ReadDoesNotAutomaticallyRewind() {
 	item := NewItem(5, nil)
 	item.WriteString("hello")
 	b := make([]byte, 5)
 
 	n, err := item.Read(b[0:2])
-	if n != 2 {
-		t.Errorf("expecting to have read 2 bytes, but got %d", n)
-	}
-	if err != nil {
-		t.Errorf("should have gotten nil error, got %v", err)
-	}
-	if string(b[0:2]) != "he" {
-		t.Errorf("expecting to have read he, got %v", string(b[0:2]))
-	}
+	Expect(n, err).To.Equal(2, nil)
+	Expect(string(b[0:2])).To.Equal("he")
 
 	n, err = item.Read(b[2:])
-	if n != 3 {
-		t.Errorf("expecting to have read 3 bytes, but got %d", n)
-	}
-	if err != io.EOF {
-		t.Errorf("error should be io.EOF, got %v", err)
-	}
-	if string(b[0:5]) != "hello" {
-		t.Errorf("expecting to have read hello, got %v", string(b[0:5]))
-	}
+	Expect(n, err).To.Equal(3, io.EOF)
+	Expect(string(b[0:5])).To.Equal("hello")
+
 
 	n, err = item.Read(b)
-	if n != 0 {
-		t.Errorf("expecting to have read 0 bytes, but got %d", n)
-	}
-	if err != io.EOF {
-		t.Errorf("error should be io.EOF, got %v", err)
-	}
-	if string(b[0:5]) != "hello" {
-		t.Errorf("expecting to have read hello, got %v", string(b[0:5]))
-	}
+	Expect(n, err).To.Equal(0, io.EOF)
+	Expect(string(b[0:5])).To.Equal("hello")
 }
 
-func TestCloneDetachesTheObject(t *testing.T) {
-	expected := "over"
+func (i *ItemTests) CloneDetachesTheObject() {
 	item := NewItem(10, nil)
 	item.WriteString("over")
 	actual := item.Clone()
 	item.Raw()[0] = '!'
-
-	if string(actual) != expected {
-		t.Errorf("Expecting %q, got %q", expected, string(actual))
-	}
+	Expect(actual[0]).To.Equal(byte('o'))
 }

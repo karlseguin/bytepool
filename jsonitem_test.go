@@ -1,54 +1,44 @@
 package bytepool
 
 import (
+	. "github.com/karlseguin/expect"
 	"testing"
 )
 
-func TestJsonCanWriteAnEncodedString(t *testing.T) {
-	expected := `"over \"9000\""`
+type JsonItemTests struct {}
+
+func Test_JsonItems(t *testing.T) {
+	Expectify(new(JsonItemTests), t)
+}
+
+func (j *JsonItemTests) WriteAnEncodedString() {
 	item := NewJsonItem(100, nil)
 	item.WriteString(`over "9000"`)
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`"over \"9000\""`)
 }
 
-func TestJsonCanWriteAString(t *testing.T) {
-	expected := `"over "9000""`
+func (j *JsonItemTests) WriteAString() {
 	item := NewJsonItem(100, nil)
 	item.WriteSafeString(`over "9000"`)
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`"over "9000""`)
 }
 
-func TestJsonWritesAnEmptyArray(t *testing.T) {
-	expected := "[]"
+func (j *JsonItemTests) JsonWritesAnEmptyArray() {
 	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.EndArray()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("[]")
 }
 
-func TestJsonWritesASingleValueArray(t *testing.T) {
-	expected := "[90]"
+func (j *JsonItemTests) JsonWritesASingleValueArray() {
 	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(90)
 	item.EndArray()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("[90]")
 }
 
-func TestJsonWritesAMultiValueArray(t *testing.T) {
-	expected := `[90,false,"abc",true]`
+func (j *JsonItemTests) JsonWritesAMultiValueArray() {
 	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(90)
@@ -56,64 +46,44 @@ func TestJsonWritesAMultiValueArray(t *testing.T) {
 	item.WriteString("abc")
 	item.WriteBool(true)
 	item.EndArray()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`[90,false,"abc",true]`)
 }
 
-func TestJsonWritesAnEmptyObject(t *testing.T) {
-	expected := `{}`
+func (j *JsonItemTests) JsonWritesAnEmptyObject() {
 	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.EndObject()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal("{}")
 }
 
-func TestJsonWritesADelimitedByte(t *testing.T) {
-	expected := `["abc","123"]`
+func (j *JsonItemTests) JsonWritesADelimitedByte() {
 	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.Write([]byte(`"abc"`))
 	item.Write([]byte(`"123"`))
 	item.EndArray()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`["abc","123"]`)
 }
 
-func TestJsonASingleValueObject(t *testing.T) {
-	expected := `{"over":"90\"00!"}`
+func (j *JsonItemTests) JsonASingleValueObject() {
 	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.WriteKeyString("over", "90\"00!")
 	item.EndObject()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`{"over":"90\"00!"}`)
 }
 
-func TestJsonAMultiValueObject(t *testing.T) {
-	expected := `{"name":"goku","power":9000,"over":true}`
+func (j *JsonItemTests) JsonAMultiValueObject() {
 	item := NewJsonItem(100, nil)
 	item.BeginObject()
 	item.WriteKeySafeString("name", "goku")
 	item.WriteKeyInt("power", 9000)
 	item.WriteKeyBool("over", true)
 	item.EndObject()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`{"name":"goku","power":9000,"over":true}`)
 }
 
-func TestWriteMultipleKeyObjects(t *testing.T) {
-	expected := `{"name":{"en":"leto"},"desc":{"en":"worm"}}`
+func (j *JsonItemTests) WriteMultipleKeyObjects() {
 	item := NewJsonItem(100, nil)
 	item.BeginObject()
 
@@ -126,14 +96,10 @@ func TestWriteMultipleKeyObjects(t *testing.T) {
 	item.EndObject()
 
 	item.EndObject()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`{"name":{"en":"leto"},"desc":{"en":"worm"}}`)
 }
 
-func TestJsonNestedObjects(t *testing.T) {
-	expected := `[1,{"name":"goku","levels":[2,{"over":{"9000":"!"}}]}]`
+func (j *JsonItemTests) JsonNestedObjects() {
 	item := NewJsonItem(100, nil)
 	item.BeginArray()
 	item.WriteInt(1)
@@ -149,8 +115,5 @@ func TestJsonNestedObjects(t *testing.T) {
 	item.EndArray()
 	item.EndObject()
 	item.EndArray()
-	actual := item.String()
-	if actual != expected {
-		t.Errorf("Expecting %q, got %q", expected, actual)
-	}
+	Expect(item.String()).To.Equal(`[1,{"name":"goku","levels":[2,{"over":{"9000":"!"}}]}]`)
 }

@@ -164,3 +164,12 @@ func (i *ItemTests) CloneDetachesTheObject() {
 	item.Raw()[0] = '!'
 	Expect(actual[0]).To.Equal(byte('o'))
 }
+
+func (i *ItemTests) ReturnsTheAvailableSpace() {
+	item := NewItem(10, nil)
+	Expect(item.Space()).To.Equal(10)
+	item.WriteString("hello")
+	Expect(item.Space()).To.Equal(5)
+	item.WriteString("world")
+	Expect(item.Space()).To.Equal(0)
+}

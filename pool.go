@@ -62,6 +62,10 @@ func (pool *Pool) Misses() int64 {
 	return atomic.LoadInt64(&pool.misses)
 }
 
+func (pool *Pool) Capacity() int {
+	return pool.capacity
+}
+
 func (pool *Pool) populate() {
 	for i := 0; i < cap(pool.list); i++ {
 		pool.list <- NewItem(pool.capacity, pool)

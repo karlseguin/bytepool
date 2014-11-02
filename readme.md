@@ -31,3 +31,17 @@ You can call the `Expanded()` method for a count of how often items were forced 
 
 
 ## Pool Methods:
+* `New(size, count)` - Creates a new pool of `count` items, each initialize to hold `size` bytes (but able to grow as needed)
+* `Checkout() *Bytes` - Gets a item which you can write/read from
+* `Depleted() int64` - How often the pool was empty. Calling this resets the counter
+* `Expanded() int64` - How often items were forced to grow beyond their initial size. Calling this resets the counter
+* `Stats() map[string]int64` - `Depleted` and `Expanded` in a map
+
+## Item Methods:
+* `Write(data []byte) (n int, err error)`
+* `WriteByte(data byte) error`
+* `WriteString(data string) (n int, err error)`
+* `Bytes() []byte`
+* `String() string`
+* `Len() int`
+* `ReadFrom(r io.Reader) (n int, err error)`

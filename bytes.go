@@ -70,3 +70,9 @@ func (b *Bytes) Release() {
 		b.pool.list <- b
 	}
 }
+
+// Alias for Release
+func (b *Bytes) Close() error {
+	b.Release()
+	return nil
+}

@@ -1,0 +1,31 @@
+# BytePool
+
+A pool for `[]byte`.
+
+## Usage:
+
+The pool is thread-safe.
+
+```go
+// create a pool of 16 items, each item has a size of 1024
+var pool = bytepool.New(1024, 16)
+
+
+bytes := pool.Checkout()
+defer bytes.Release()
+bytes.Write([]byte("hello"))
+fmt.Prinltn(bytes.String())
+```
+
+## Pool Growth
+Getting an item from the pool is non-blocking. If the pool is depleted, a new item will be created. However, such dynamically created items are not added back to the pool on release. In other words, the # of items within the pool is fixed.
+
+You can access the `Depleted()` method for count of how often the pool was depleted. Ideally, this value should be 0.
+
+## Item Growth
+Items are created with an initial size. Adding more data than this size will cause the item to internally and efficiently convert itself to a `bytes.Buffer`. However, the growth is not permanent: on `Release` the initial allocation is re-established (without needing to do a new allocation).
+
+In other words, the total memory used by the bytepool should be size * count. For our above example, that's 16KB. The size will increase as needed, but will always revert back to 16KB (and that 16KB is only initiated once, on startup).
+
+
+## Pool Methods:

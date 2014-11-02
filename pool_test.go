@@ -32,7 +32,7 @@ func (pt *PoolTests) DynamicallyCreatesAnItemWhenPoolIsEmpty() {
 	bytes1.Release()
 	bytes2.Release()
 	Expect(len(p.list)).To.Equal(1)
-	Expect(p.Misses()).To.Equal(int64(1))
+	Expect(p.Depleted()).To.Equal(int64(1))
 }
 
 func (_ *PoolTests) ReleasesAnItemBackIntoThePool() {
@@ -52,7 +52,7 @@ func (pt *PoolTests) StatsTracksAndResetMisses() {
 	p.Checkout()
 	p.Checkout()
 
-	Expect(p.Stats()["misses"]).To.Equal(int64(2))
+	Expect(p.Stats()["depleted"]).To.Equal(int64(2))
 	//calling stats should reset this
-	Expect(p.Stats()["misses"]).To.Equal(int64(0))
+	Expect(p.Stats()["depleted"]).To.Equal(int64(0))
 }

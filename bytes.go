@@ -36,25 +36,30 @@ func newPooled(pool *Pool, capacity int) *Bytes {
 	return b
 }
 
+// Write the bytes
 func (b *Bytes) Write(data []byte) (n int, err error) {
 	b.bytes, n, err = b.write(data)
 	return n, err
 }
 
+// Write a byte
 func (b *Bytes) WriteByte(d byte) (err error) {
 	b.bytes, err = b.writeByte(d)
 	return err
 }
 
+// Write a string
 func (b *Bytes) WriteString(str string) (int, error) {
 	return b.Write([]byte(str))
 }
 
+// Read from the io.Reader
 func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
 	b.bytes, n, err = b.readFrom(r)
 	return n, err
 }
 
+// Release the item back into the pool
 func (b *Bytes) Release() {
 	if b.pool != nil {
 		b.fixed.length = 0

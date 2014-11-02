@@ -6,9 +6,9 @@ import (
 )
 
 type fixed struct {
-	length int
+	length   int
 	capacity int
-	bytes []byte
+	bytes    []byte
 }
 
 func (f *fixed) Len() int {
@@ -72,7 +72,7 @@ func (f *fixed) toBuffer() *buffer {
 }
 
 func (f *fixed) hasSpace(toAdd int) bool {
-	return f.length + toAdd <= f.capacity
+	return f.length+toAdd <= f.capacity
 }
 
 func (f *fixed) full() bool {

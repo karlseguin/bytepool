@@ -6,7 +6,7 @@ import (
 )
 
 type Pool struct {
-	depleted   int64
+	depleted int64
 	size     int
 	list     chan *Bytes
 	stats    map[string]int64
@@ -16,9 +16,9 @@ type Pool struct {
 // an array of size bytes (but can dynamically grow)
 func New(size, count int) *Pool {
 	pool := &Pool{
-		size:     size,
-		list:     make(chan *Bytes, count),
-		stats:    map[string]int64{"depleted": 0},
+		size:  size,
+		list:  make(chan *Bytes, count),
+		stats: map[string]int64{"depleted": 0},
 	}
 	for i := 0; i < count; i++ {
 		pool.list <- newPooled(pool, size)

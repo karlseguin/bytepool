@@ -1,9 +1,9 @@
 package bytepool
 
 import (
-	"testing"
 	stdbytes "bytes"
 	. "github.com/karlseguin/expect"
+	"testing"
 )
 
 type BytesTest struct{}
@@ -76,7 +76,6 @@ func (_ BytesTest) ReleasesWhenOverflow() {
 	Expect(bytes.Len()).To.Equal(0)
 	Expect(cap(bytes.bytes.(*fixed).bytes)).To.Equal(10)
 }
-
 
 func (_ BytesTest) ReadFrom() {
 	bytes := NewBytes(10)

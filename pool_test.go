@@ -1,9 +1,9 @@
 package bytepool
 
 import (
+	. "github.com/karlseguin/expect"
 	"reflect"
 	"testing"
-	. "github.com/karlseguin/expect"
 )
 
 type PoolTests struct{}

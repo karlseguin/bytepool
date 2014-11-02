@@ -16,7 +16,7 @@ type bytes interface {
 
 type Bytes struct {
 	bytes
-	pool *Pool
+	pool  *Pool
 	fixed *fixed
 }
 

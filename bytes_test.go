@@ -1,0 +1,69 @@
+package bytepool
+
+import (
+	"testing"
+	. "github.com/karlseguin/expect"
+)
+
+type BytesTest struct{}
+
+func Test_Bytes(t *testing.T) {
+	Expectify(new(BytesTest), t)
+}
+
+func (_ BytesTest) WriteWithinCapacity() {
+	bytes := NewBytes(16)
+	bytes.Write([]byte("it's over 9000!"))
+	Expect(bytes.String()).To.Equal("it's over 9000!")
+	Expect(bytes.Len()).To.Equal(15)
+}
+
+func (_ BytesTest) WriteAtCapacity() {
+	bytes := NewBytes(16)
+	bytes.Write([]byte("it's over 9000!!"))
+	Expect(bytes.String()).To.Equal("it's over 9000!!")
+	Expect(bytes.Len()).To.Equal(16)
+}
+
+func (_ BytesTest) WriteOverCapacity1() {
+	bytes := NewBytes(16)
+	bytes.Write([]byte("it's over 9000!!!"))
+	Expect(bytes.String()).To.Equal("it's over 9000!!!")
+	Expect(bytes.Len()).To.Equal(17)
+}
+
+func (_ BytesTest) WriteOverCapacity2() {
+	bytes := NewBytes(16)
+	bytes.Write([]byte("it's over 9000"))
+	bytes.Write([]byte("!!!"))
+	Expect(bytes.String()).To.Equal("it's over 9000!!!")
+	Expect(bytes.Len()).To.Equal(17)
+}
+
+func (_ BytesTest) WriteOverCapacity3() {
+	bytes := NewBytes(15)
+	bytes.Write([]byte("it's over 9000"))
+	bytes.Write([]byte("!!"))
+	bytes.WriteString("!")
+	bytes.WriteByte('.')
+	Expect(bytes.String()).To.Equal("it's over 9000!!!.")
+	Expect(bytes.Len()).To.Equal(18)
+}
+
+func (_ BytesTest) ReleasesWhenNoOverflow() {
+	bytes := New(20, 1).Checkout()
+	bytes.Write([]byte("it's over 9000!"))
+	bytes.Release()
+	Expect(bytes.String()).To.Equal("")
+	Expect(bytes.Len()).To.Equal(0)
+	Expect(cap(bytes.bytes.(*fixed).bytes)).To.Equal(20)
+}
+
+func (_ BytesTest) ReleasesWhenOverflow() {
+	bytes := New(10, 1).Checkout()
+	bytes.Write([]byte("it's over 9000!"))
+	bytes.Release()
+	Expect(bytes.String()).To.Equal("")
+	Expect(bytes.Len()).To.Equal(0)
+	Expect(cap(bytes.bytes.(*fixed).bytes)).To.Equal(10)
+}

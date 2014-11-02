@@ -32,6 +32,9 @@ func newPooled(pool *Pool, capacity int) *Bytes {
 			bytes:    make([]byte, capacity),
 		},
 	}
+	if pool != nil {
+		b.fixed.onExpand = pool.onExpand
+	}
 	b.bytes = b.fixed
 	return b
 }

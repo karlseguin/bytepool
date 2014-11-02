@@ -9,6 +9,7 @@ type fixed struct {
 	length   int
 	capacity int
 	bytes    []byte
+	onExpand func()
 }
 
 func (f *fixed) Len() int {
@@ -66,6 +67,9 @@ func (f *fixed) readFrom(reader io.Reader) (bytes, int64, error) {
 }
 
 func (f *fixed) toBuffer() *buffer {
+	if f.onExpand != nil {
+		f.onExpand()
+	}
 	buf := &buffer{stdbytes.NewBuffer(f.bytes)}
 	buf.Truncate(f.length)
 	return buf

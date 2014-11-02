@@ -3,6 +3,7 @@ package bytepool
 import (
 	. "github.com/karlseguin/expect"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -23,7 +24,7 @@ func (_ *PoolTests) HasTheSpecifiedNumberOfItems() {
 	Expect(cap(p.list)).To.Equal(3)
 }
 
-func (pt *PoolTests) DynamicallyCreatesAnItemWhenPoolIsEmpty() {
+func (_ *PoolTests) DynamicallyCreatesAnItemWhenPoolIsEmpty() {
 	p := New(23, 1)
 	bytes1 := p.Checkout()
 	bytes2 := p.Checkout()
@@ -46,7 +47,7 @@ func (_ *PoolTests) ReleasesAnItemBackIntoThePool() {
 	}
 }
 
-func (pt *PoolTests) StatsTracksAndResetMisses() {
+func (_ *PoolTests) StatsTracksAndResetMisses() {
 	p := New(1, 1)
 	p.Checkout()
 	p.Checkout()
@@ -55,4 +56,26 @@ func (pt *PoolTests) StatsTracksAndResetMisses() {
 	Expect(p.Stats()["depleted"]).To.Equal(int64(2))
 	//calling stats should reset this
 	Expect(p.Stats()["depleted"]).To.Equal(int64(0))
+}
+
+func (_ *PoolTests) TracksExpansion() {
+	p := New(2, 1)
+	for i := 1; i < 6; i++ {
+		bytes := p.Checkout()
+		bytes.WriteString(strings.Repeat("!", i))
+		bytes.Release()
+	}
+	Expect(p.Stats()["expanded"]).To.Equal(int64(3))
+	//calling stats should reset this
+	Expect(p.Stats()["expanded"]).To.Equal(int64(0))
+}
+
+// why? because it's hard
+func (_ *PoolTests) DoesNotTrackUnpooledExpansion() {
+	p := New(2, 1)
+	for i := 1; i < 6; i++ {
+		bytes := p.Checkout()
+		bytes.WriteString(strings.Repeat("!", i))
+	}
+	Expect(p.Stats()["expanded"]).To.Equal(int64(0))
 }

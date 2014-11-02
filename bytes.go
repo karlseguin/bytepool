@@ -1,8 +1,13 @@
 package bytepool
 
+import (
+	"io"
+)
+
 type bytes interface {
 	write(b []byte) (bytes, int, error)
 	writeByte(b byte) (bytes, error)
+	readFrom(r io.Reader) (bytes, int64, error)
 
 	Bytes() []byte
 	String() string
@@ -32,17 +37,22 @@ func newPooled(pool *Pool, capacity int) *Bytes {
 }
 
 func (b *Bytes) Write(data []byte) (n int, err error) {
-	b.bytes, n, err = b.bytes.write(data)
+	b.bytes, n, err = b.write(data)
 	return n, err
 }
 
 func (b *Bytes) WriteByte(d byte) (err error) {
-	b.bytes, err = b.bytes.writeByte(d)
+	b.bytes, err = b.writeByte(d)
 	return err
 }
 
 func (b *Bytes) WriteString(str string) (int, error) {
 	return b.Write([]byte(str))
+}
+
+func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
+	b.bytes, n, err = b.readFrom(r)
+	return n, err
 }
 
 func (b *Bytes) Release() {

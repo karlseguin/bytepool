@@ -2,6 +2,7 @@ package bytepool
 
 import (
 	"testing"
+	stdbytes "bytes"
 	. "github.com/karlseguin/expect"
 )
 
@@ -9,6 +10,14 @@ type BytesTest struct{}
 
 func Test_Bytes(t *testing.T) {
 	Expectify(new(BytesTest), t)
+}
+
+func (_ BytesTest) WriteByte() {
+	bytes := NewBytes(1)
+	bytes.WriteByte('!')
+	Expect(bytes.String()).To.Equal("!")
+	bytes.WriteByte('?')
+	Expect(bytes.String()).To.Equal("!?")
 }
 
 func (_ BytesTest) WriteWithinCapacity() {
@@ -66,4 +75,17 @@ func (_ BytesTest) ReleasesWhenOverflow() {
 	Expect(bytes.String()).To.Equal("")
 	Expect(bytes.Len()).To.Equal(0)
 	Expect(cap(bytes.bytes.(*fixed).bytes)).To.Equal(10)
+}
+
+
+func (_ BytesTest) ReadFrom() {
+	bytes := NewBytes(10)
+	bytes.ReadFrom(stdbytes.NewBufferString("hello"))
+	Expect(bytes.String()).To.Equal("hello")
+	bytes.ReadFrom(stdbytes.NewBufferString("world"))
+	Expect(bytes.String()).To.Equal("helloworld")
+	bytes.ReadFrom(stdbytes.NewBufferString("how"))
+	Expect(bytes.String()).To.Equal("helloworldhow")
+	bytes.ReadFrom(stdbytes.NewBufferString("goes"))
+	Expect(bytes.String()).To.Equal("helloworldhowgoes")
 }

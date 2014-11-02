@@ -2,6 +2,7 @@ package bytepool
 
 import (
 	stdbytes "bytes"
+	"io"
 )
 
 type buffer struct {
@@ -16,4 +17,9 @@ func (b *buffer) write(data []byte) (bytes, int, error) {
 func (b *buffer) writeByte(data byte) (bytes, error) {
 	err := b.WriteByte(data)
 	return b, err
+}
+
+func (b *buffer) readFrom(r io.Reader) (bytes, int64, error) {
+	n, err := b.ReadFrom(r)
+	return b, n, err
 }

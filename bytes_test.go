@@ -3,6 +3,7 @@ package bytepool
 import (
 	stdbytes "bytes"
 	. "github.com/karlseguin/expect"
+	"io"
 	"testing"
 )
 
@@ -87,4 +88,22 @@ func (_ BytesTest) ReadFrom() {
 	Expect(bytes.String()).To.Equal("helloworldhow")
 	bytes.ReadFrom(stdbytes.NewBufferString("goes"))
 	Expect(bytes.String()).To.Equal("helloworldhowgoes")
+}
+
+func (_ BytesTest) FullRead() {
+	bytes := NewBytes(10)
+	bytes.WriteString("hello!")
+	data := make([]byte, 10)
+	n, err := bytes.Read(data)
+	Expect(n, err).To.Equal(6, io.EOF)
+	Expect(string(data[:n])).To.Equal("hello!")
+}
+
+func (_ BytesTest) Partial() {
+	bytes := NewBytes(10)
+	bytes.WriteString("hello!")
+	data := make([]byte, 4)
+	n, err := bytes.Read(data)
+	Expect(n, err).To.Equal(4, nil)
+	Expect(string(data)).To.Equal("hell")
 }

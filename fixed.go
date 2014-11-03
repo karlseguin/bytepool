@@ -6,6 +6,7 @@ import (
 )
 
 type fixed struct {
+	r        int
 	length   int
 	capacity int
 	bytes    []byte
@@ -64,6 +65,17 @@ func (f *fixed) readFrom(reader io.Reader) (bytes, int64, error) {
 			return f, read, err
 		}
 	}
+}
+func (f *fixed) Read(data []byte) (int, error) {
+	if f.r == f.length {
+		return 0, io.EOF
+	}
+	n := copy(data, f.bytes[f.r:f.length])
+	f.r += n
+	if f.r == f.length {
+		return n, io.EOF
+	}
+	return n, nil
 }
 
 func (f *fixed) toBuffer() *buffer {

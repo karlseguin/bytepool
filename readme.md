@@ -45,4 +45,5 @@ You can call the `Expanded()` method for a count of how often items were forced 
 * `String() string`
 * `Len() int`
 * `ReadFrom(r io.Reader) (n int, err error)`
+* `Read(data []byte) (int, error)`
 * `Release()` or `Close()`

@@ -9,6 +9,7 @@ type bytes interface {
 	writeByte(b byte) (bytes, error)
 	readFrom(r io.Reader) (bytes, int64, error)
 
+	Read(b []byte) (int, error)
 	Bytes() []byte
 	String() string
 	Len() int
@@ -66,6 +67,7 @@ func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
 func (b *Bytes) Release() {
 	if b.pool != nil {
 		b.fixed.length = 0
+		b.fixed.r = 0
 		b.bytes = b.fixed
 		b.pool.list <- b
 	}

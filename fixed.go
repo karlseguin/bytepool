@@ -47,25 +47,35 @@ func (f *fixed) writeByte(data byte) (bytes, error) {
 	return f, nil
 }
 
-func (f *fixed) readFrom(reader io.Reader) (bytes, int64, error) {
-	var read int64
+func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error) {
+	ex := int(expected)
+	if ex > f.space() {
+		return f.toBuffer().readNFrom(expected, reader)
+	}
+	end := f.capacity
+	if ex != 0 {
+		end = ex + f.length
+	}
+
+	read := 0
 	for {
 		if f.full() {
 			buf := f.toBuffer()
-			n, err := buf.ReadFrom(reader)
-			return buf, read + n, err
+			_, n, err := buf.readNFrom(expected, reader)
+			return buf, int64(read) + n, err
 		}
-		r, err := reader.Read(f.bytes[f.length:])
-		read += int64(r)
+		r, err := reader.Read(f.bytes[f.length:end])
+		read += r
 		f.length += r
-		if err == io.EOF {
-			return f, read, nil
+		if err == io.EOF || (expected != 0 && read == ex) {
+			return f, int64(read), nil
 		}
 		if err != nil {
-			return f, read, err
+			return f, int64(read), err
 		}
 	}
 }
+
 func (f *fixed) Read(data []byte) (int, error) {
 	if f.r == f.length {
 		return 0, io.EOF
@@ -93,4 +103,8 @@ func (f *fixed) hasSpace(toAdd int) bool {
 
 func (f *fixed) full() bool {
 	return f.length == f.capacity
+}
+
+func (f *fixed) space() int {
+	return f.capacity - f.length
 }

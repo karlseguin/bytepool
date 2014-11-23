@@ -44,7 +44,8 @@ You can call the `Expanded()` method for a count of how often items were forced 
 * `Bytes() []byte`
 * `String() string`
 * `Len() int`
-* `ReadFrom(r io.Reader) (n int, err error)`
+* `ReadFrom(r io.Reader) (n int64, err error)`
+* `ReadNFrom(n int64, r io.Reader) (m int64, err error)`
 * `Read(data []byte) (int, error)`
 * `Release()` or `Close()` - Resets and releases the item back to the pool.
 * `Reset()` - Resets the item without releasing it back to the pool

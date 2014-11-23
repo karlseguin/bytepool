@@ -90,6 +90,24 @@ func (_ BytesTest) ReadFrom() {
 	Expect(bytes.String()).To.Equal("helloworldhowgoes")
 }
 
+func (_ BytesTest) ReadNFrom() {
+	bytes := NewBytes(10)
+	bytes.ReadNFrom(4, stdbytes.NewBufferString("hello"))
+	Expect(bytes.String()).To.Equal("hell")
+	bytes.ReadNFrom(4, stdbytes.NewBufferString("world"))
+	Expect(bytes.String()).To.Equal("hellworl")
+	bytes.ReadNFrom(6, stdbytes.NewBufferString("thisisfun"))
+	Expect(bytes.String()).To.Equal("hellworlthisis")
+	bytes.ReadNFrom(2, stdbytes.NewBufferString("go"))
+	Expect(bytes.String()).To.Equal("hellworlthisisgo")
+}
+
+func (_ BytesTest) ReadNFromExact() {
+	bytes := NewBytes(3)
+	bytes.ReadNFrom(3, stdbytes.NewBufferString("hello"))
+	Expect(bytes.String()).To.Equal("hel")
+}
+
 func (_ BytesTest) FullRead() {
 	bytes := NewBytes(10)
 	bytes.WriteString("hello!")

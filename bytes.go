@@ -7,7 +7,7 @@ import (
 type bytes interface {
 	write(b []byte) (bytes, int, error)
 	writeByte(b byte) (bytes, error)
-	readFrom(r io.Reader) (bytes, int64, error)
+	readNFrom(n int64, r io.Reader) (bytes, int64, error)
 
 	Read(b []byte) (int, error)
 	Bytes() []byte
@@ -59,8 +59,13 @@ func (b *Bytes) WriteString(str string) (int, error) {
 
 // Read from the io.Reader
 func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
-	b.bytes, n, err = b.readFrom(r)
-	return n, err
+	return b.ReadNFrom(0, r)
+}
+
+// Read N bytes from the io.Reader
+func (b *Bytes) ReadNFrom(n int64, r io.Reader) (m int64, err error) {
+	b.bytes, m, err = b.readNFrom(n, r)
+	return m, err
 }
 
 // Reset the object without releasing it

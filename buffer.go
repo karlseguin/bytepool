@@ -19,7 +19,17 @@ func (b *buffer) writeByte(data byte) (bytes, error) {
 	return b, err
 }
 
-func (b *buffer) readFrom(r io.Reader) (bytes, int64, error) {
-	n, err := b.ReadFrom(r)
-	return b, n, err
+func (b *buffer) readNFrom(n int64, r io.Reader) (bytes, int64, error) {
+	if n == 0 {
+		m, err := b.ReadFrom(r)
+		return b, m, err
+	}
+	s := b.Len()
+	t := int(n) + s
+	b.Grow(t)
+	bytes := b.Bytes()
+	bytes = bytes[:t]
+	m, err := io.ReadFull(r, bytes[s:t])
+	b.Write(bytes[s:t])
+	return b, int64(m), err
 }

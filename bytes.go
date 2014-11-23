@@ -63,12 +63,16 @@ func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
+// Reset the object without releasing it
+func (b *Bytes) Reset() {
+	b.fixed.length, b.fixed.r = 0, 0
+	b.bytes = b.fixed
+}
+
 // Release the item back into the pool
 func (b *Bytes) Release() {
 	if b.pool != nil {
-		b.fixed.length = 0
-		b.fixed.r = 0
-		b.bytes = b.fixed
+		b.Reset()
 		b.pool.list <- b
 	}
 }

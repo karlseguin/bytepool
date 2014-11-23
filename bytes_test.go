@@ -107,3 +107,21 @@ func (_ BytesTest) Partial() {
 	Expect(n, err).To.Equal(4, nil)
 	Expect(string(data)).To.Equal("hell")
 }
+
+func (_ BytesTest) Reset() {
+	bytes := NewBytes(10)
+	bytes.WriteString("hello!")
+	bytes.Reset()
+	bytes.WriteString("spice")
+	Expect(bytes.String()).To.Equal("spice")
+}
+
+func (_ BytesTest) ResetFromExpansion() {
+	bytes := NewBytes(2)
+	bytes.WriteString("hello!")
+	_, is := bytes.bytes.(*buffer)
+	Expect(is).To.Equal(true)
+	bytes.Reset()
+	_, is = bytes.bytes.(*fixed)
+	Expect(is).To.Equal(true)
+}

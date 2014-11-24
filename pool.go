@@ -2,6 +2,7 @@
 package bytepool
 
 import (
+	"encoding/binary"
 	"sync/atomic"
 )
 
@@ -10,19 +11,25 @@ type Pool struct {
 	expanded int64
 	size     int
 	list     chan *Bytes
+	enc      binary.ByteOrder
 	stats    map[string]int64
 }
 
 // Create a new pool. The pool contains count items. Each item allocates
 // an array of size bytes (but can dynamically grow)
 func New(size, count int) *Pool {
+	return NewEndian(size, count, binary.BigEndian)
+}
+
+func NewEndian(size, count int, enc binary.ByteOrder) *Pool {
 	pool := &Pool{
+		enc:   enc,
 		size:  size,
 		list:  make(chan *Bytes, count),
 		stats: map[string]int64{"depleted": 0, "expanded": 0},
 	}
 	for i := 0; i < count; i++ {
-		pool.list <- newPooled(pool, size)
+		pool.list <- newPooled(pool, size, enc)
 	}
 	return pool
 }
@@ -34,7 +41,7 @@ func (p *Pool) Checkout() *Bytes {
 		return bytes
 	default:
 		atomic.AddInt64(&p.depleted, 1)
-		return NewBytes(p.size)
+		return NewEndianBytes(p.size, p.enc)
 	}
 }
 

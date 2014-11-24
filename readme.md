@@ -49,3 +49,9 @@ You can call the `Expanded()` method for a count of how often items were forced 
 * `Read(data []byte) (int, error)`
 * `Release()` or `Close()` - Resets and releases the item back to the pool.
 * `Reset()` - Resets the item without releasing it back to the pool
+
+## Numeric Encoding
+The `PutUint16`, `PutUint32` and `PutUint64` methods can be used to write integers
+in big endian.
+
+To write using little endian, create a pool using `NewEndian` or an individual item using `NewEndianBytes` and pass the `binary.LittleEndian` object from the stdlib "encoding/binary" package.

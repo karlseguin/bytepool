@@ -2,6 +2,7 @@ package bytepool
 
 import (
 	stdbytes "bytes"
+	"encoding/binary"
 	. "github.com/karlseguin/expect"
 	"io"
 	"testing"
@@ -142,4 +143,22 @@ func (_ BytesTest) ResetFromExpansion() {
 	bytes.Reset()
 	_, is = bytes.bytes.(*fixed)
 	Expect(is).To.Equal(true)
+}
+
+func (_ BytesTest) BigEndian() {
+	p := New(10, 1)
+	b := p.Checkout()
+	b.PutUint64(2933)
+	Expect(b.Bytes()).To.Equal([]byte{0, 0, 0, 0, 0, 0, 11, 117})
+	b.PutUint32(8484848)
+	Expect(b.Bytes()).To.Equal([]byte{0, 0, 0, 0, 0, 0, 11, 117, 0, 129, 119, 240})
+}
+
+func (_ BytesTest) LittleEndian() {
+	p := NewEndian(10, 1, binary.LittleEndian)
+	b := p.Checkout()
+	b.PutUint64(2933)
+	Expect(b.Bytes()).To.Equal([]byte{117, 11, 0, 0, 0, 0, 0, 0})
+	b.PutUint32(8484848)
+	Expect(b.Bytes()).To.Equal([]byte{117, 11, 0, 0, 0, 0, 0, 0, 240, 119, 129, 0})
 }

@@ -1,6 +1,7 @@
 package bytepool
 
 import (
+	"encoding/binary"
 	"io"
 )
 
@@ -17,21 +18,29 @@ type bytes interface {
 
 type Bytes struct {
 	bytes
-	pool  *Pool
-	fixed *fixed
+	pool    *Pool
+	fixed   *fixed
+	scratch []byte
+	enc     binary.ByteOrder
 }
 
 func NewBytes(capacity int) *Bytes {
-	return newPooled(nil, capacity)
+	return NewEndianBytes(capacity, binary.BigEndian)
 }
 
-func newPooled(pool *Pool, capacity int) *Bytes {
+func NewEndianBytes(capacity int, enc binary.ByteOrder) *Bytes {
+	return newPooled(nil, capacity, enc)
+}
+
+func newPooled(pool *Pool, capacity int, enc binary.ByteOrder) *Bytes {
 	b := &Bytes{
+		enc:  enc,
 		pool: pool,
 		fixed: &fixed{
 			capacity: capacity,
 			bytes:    make([]byte, capacity),
 		},
+		scratch: make([]byte, 8),
 	}
 	if pool != nil {
 		b.fixed.onExpand = pool.onExpand
@@ -50,6 +59,21 @@ func (b *Bytes) Write(data []byte) (n int, err error) {
 func (b *Bytes) WriteByte(d byte) (err error) {
 	b.bytes, err = b.writeByte(d)
 	return err
+}
+
+func (b *Bytes) PutUint16(n uint16) {
+	b.enc.PutUint16(b.scratch, n)
+	b.bytes, _, _ = b.write(b.scratch[:2])
+}
+
+func (b *Bytes) PutUint32(n uint32) {
+	b.enc.PutUint32(b.scratch, n)
+	b.bytes, _, _ = b.write(b.scratch[:4])
+}
+
+func (b *Bytes) PutUint64(n uint64) {
+	b.enc.PutUint64(b.scratch, n)
+	b.bytes, _, _ = b.write(b.scratch[:8])
 }
 
 // Write a string

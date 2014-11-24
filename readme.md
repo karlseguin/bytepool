@@ -67,7 +67,7 @@ For example, say we were writing into a buffer where bytes 4-8 were always the v
 ```go
 //setup
 pool := bytepool.New(256, 10)
-pool.Each(func(b *bytepool.Byte) {
+pool.Each(func(b *bytepool.Bytes) {
   b.Position(4)
   b.PutInt32(30)
 })

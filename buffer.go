@@ -19,6 +19,24 @@ func (b *buffer) writeByte(data byte) (bytes, error) {
 	return b, err
 }
 
+func (b *buffer) position(n uint) bytes {
+	s := b.Len()
+	nn := int(n)
+	t := nn - s
+	if t == 0 {
+		return b
+	}
+	if t < 0 {
+		b.Truncate(nn)
+		return b
+	}
+	b.Grow(t)
+	bytes := b.Bytes()
+	bytes = bytes[:nn]
+	b.Write(bytes[s:nn])
+	return b
+}
+
 func (b *buffer) readNFrom(n int64, r io.Reader) (bytes, int64, error) {
 	if n == 0 {
 		m, err := b.ReadFrom(r)

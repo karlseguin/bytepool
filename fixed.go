@@ -47,6 +47,15 @@ func (f *fixed) writeByte(data byte) (bytes, error) {
 	return f, nil
 }
 
+func (f *fixed) position(n uint) bytes {
+	nn := int(n)
+	if nn >= f.capacity {
+		return f.toBuffer().position(n)
+	}
+	f.length = nn
+	return f
+}
+
 func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error) {
 	ex := int(expected)
 	if f.hasSpace(ex) == false {

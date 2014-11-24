@@ -49,6 +49,7 @@ You can call the `Expanded()` method for a count of how often items were forced 
 * `Read(data []byte) (int, error)`
 * `Release()` or `Close()` - Resets and releases the item back to the pool.
 * `Reset()` - Resets the item without releasing it back to the pool
+* `Position(n uint)` - Moves to the specified absolute position. This will grow the buffer if needed.
 
 ## Numeric Encoding
 The `PutUint16`, `PutUint32` and `PutUint64` methods can be used to write integers

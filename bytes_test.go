@@ -162,3 +162,25 @@ func (_ BytesTest) LittleEndian() {
 	b.PutUint32(8484848)
 	Expect(b.Bytes()).To.Equal([]byte{117, 11, 0, 0, 0, 0, 0, 0, 240, 119, 129, 0})
 }
+
+func (_ BytesTest) PositionFixed() {
+	bytes := NewBytes(10)
+	bytes.Position(6)
+	bytes.WriteString("abc")
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 0, 0, 97, 98, 99})
+	bytes.Position(2)
+	bytes.WriteByte(4)
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 4})
+}
+
+func (_ BytesTest) PositionBuffer() {
+	bytes := NewBytes(2)
+	bytes.Position(4)
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0})
+	bytes.WriteString("12")
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49, 50})
+	bytes.Position(10)
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49, 50, 0, 0, 0, 0})
+	bytes.Position(5)
+	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49})
+}

@@ -9,6 +9,7 @@ type bytes interface {
 	write(b []byte) (bytes, int, error)
 	writeByte(b byte) (bytes, error)
 	readNFrom(n int64, r io.Reader) (bytes, int64, error)
+	position(n uint) bytes
 
 	Read(b []byte) (int, error)
 	Bytes() []byte
@@ -90,6 +91,10 @@ func (b *Bytes) ReadFrom(r io.Reader) (n int64, err error) {
 func (b *Bytes) ReadNFrom(n int64, r io.Reader) (m int64, err error) {
 	b.bytes, m, err = b.readNFrom(n, r)
 	return m, err
+}
+
+func (b *Bytes) Position(n uint) {
+	b.bytes = b.position(n)
 }
 
 // Reset the object without releasing it

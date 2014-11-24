@@ -49,7 +49,7 @@ func (f *fixed) writeByte(data byte) (bytes, error) {
 
 func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error) {
 	ex := int(expected)
-	if ex > f.space() {
+	if f.hasSpace(ex) == false {
 		return f.toBuffer().readNFrom(expected, reader)
 	}
 	end := f.capacity
@@ -103,8 +103,4 @@ func (f *fixed) hasSpace(toAdd int) bool {
 
 func (f *fixed) full() bool {
 	return f.length == f.capacity
-}
-
-func (f *fixed) space() int {
-	return f.capacity - f.length
 }

@@ -56,3 +56,26 @@ The `PutUint16`, `PutUint32` and `PutUint64` methods can be used to write intege
 in big endian.
 
 To write using little endian, create a pool using `NewEndian` or an individual item using `NewEndianBytes` and pass the `binary.LittleEndian` object from the stdlib "encoding/binary" package.
+
+# Each
+It's possible to pre-fill byte items within the pool through the use of the pool's `Each` and the item's `Position` functions. You have to take special care to properly `Position` the item on each checkout.
+
+If you pre-fill the item with more data than the initial capacity, the data will be lost. It makes no sense that you'd define a pool with items having a capacity of 50 bytes., but pre-fill 100 bytes.
+
+For example, say we were writing into a buffer where bytes 4-8 were always the value 30, we could do:
+
+```go
+//setup
+pool := bytepool.New(256, 10)
+pool.Each(func(b *bytepool.Byte) {
+  b.Position(4)
+  b.PutInt32(30)
+})
+
+
+// code that uses the buffer
+bytes := pool.Checkout()
+bytes.PutInt32(size) //write into bytes[0:4]
+bytes.Position(8)    //skip bytes[4:8] which we already filled
+//continue
+```

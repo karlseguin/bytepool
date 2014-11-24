@@ -45,6 +45,25 @@ func (p *Pool) Checkout() *Bytes {
 	}
 }
 
+// Exposes every item currently in the pool
+// If an item is checkout, each won't see it.
+// As such, though thread-safe, you probably only
+// want to call this method on init/startup.
+func (p *Pool) Each(f func(*Bytes)) {
+	l := len(p.list)
+	t := make([]*Bytes, l)
+	defer func() {
+		for i := 0; i < len(t); i++ {
+			t[i].Release()
+		}
+	}()
+	for i := 0; i < l; i++ {
+		b := <-p.list
+		t[i] = b
+		f(b)
+	}
+}
+
 // Get a count of how often Checkout() was called
 // but no item was available (thus causing an item to be
 // created on the fly)

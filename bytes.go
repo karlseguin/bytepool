@@ -77,6 +77,30 @@ func (b *Bytes) PutUint64(n uint64) {
 	b.bytes, _, _ = b.write(b.scratch[:8])
 }
 
+func (b *Bytes) Uint16() uint16 {
+	n, _ := b.bytes.Read(b.scratch[:2])
+	if n == 2 {
+		return b.enc.Uint16(b.scratch)
+	}
+	return 0
+}
+
+func (b *Bytes) Uint32() uint32 {
+	n, _ := b.bytes.Read(b.scratch[:4])
+	if n == 4 {
+		return b.enc.Uint32(b.scratch)
+	}
+	return 0
+}
+
+func (b *Bytes) Uint64() uint64 {
+	n, _ := b.bytes.Read(b.scratch[:8])
+	if n == 8 {
+		return b.enc.Uint64(b.scratch)
+	}
+	return 0
+}
+
 // Write a string
 func (b *Bytes) WriteString(str string) (int, error) {
 	return b.Write([]byte(str))

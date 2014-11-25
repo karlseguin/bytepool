@@ -101,8 +101,8 @@ func (f *fixed) toBuffer() *buffer {
 	if f.onExpand != nil {
 		f.onExpand()
 	}
-	buf := &buffer{stdbytes.NewBuffer(f.bytes)}
-	buf.Truncate(f.length)
+	buf := &buffer{stdbytes.NewBuffer(f.bytes[f.r:])}
+	buf.Truncate(f.length - f.r)
 	return buf
 }
 

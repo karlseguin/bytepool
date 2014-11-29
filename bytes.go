@@ -11,6 +11,7 @@ type bytes interface {
 	readNFrom(n int64, r io.Reader) (bytes, int64, error)
 	position(n uint) bytes
 
+	ReadByte() (byte, error)
 	Read(b []byte) (int, error)
 	Bytes() []byte
 	String() string
@@ -77,28 +78,33 @@ func (b *Bytes) WriteUint64(n uint64) {
 	b.bytes, _, _ = b.write(b.scratch[:8])
 }
 
-func (b *Bytes) ReadUint16() uint16 {
+func (b *Bytes) ReadByte() (byte, error) {
+	bt, err := b.bytes.ReadByte()
+	return bt, err
+}
+
+func (b *Bytes) ReadUint16() (uint16, error) {
 	n, _ := b.bytes.Read(b.scratch[:2])
 	if n == 2 {
-		return b.enc.Uint16(b.scratch)
+		return b.enc.Uint16(b.scratch), nil
 	}
-	return 0
+	return 0, io.EOF
 }
 
-func (b *Bytes) ReadUint32() uint32 {
+func (b *Bytes) ReadUint32() (uint32, error) {
 	n, _ := b.bytes.Read(b.scratch[:4])
 	if n == 4 {
-		return b.enc.Uint32(b.scratch)
+		return b.enc.Uint32(b.scratch), nil
 	}
-	return 0
+	return 0, io.EOF
 }
 
-func (b *Bytes) ReadUint64() uint64 {
+func (b *Bytes) ReadUint64() (uint64, error) {
 	n, _ := b.bytes.Read(b.scratch[:8])
 	if n == 8 {
-		return b.enc.Uint64(b.scratch)
+		return b.enc.Uint64(b.scratch), nil
 	}
-	return 0
+	return 0, io.EOF
 }
 
 // Write a string

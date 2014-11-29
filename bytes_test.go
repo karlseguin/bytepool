@@ -168,12 +168,52 @@ func (_ BytesTest) ReadBigEndian() {
 	b := p.Checkout()
 	b.WriteUint64(2933)
 	b.WriteUint32(10)
-	Expect(b.ReadUint64()).To.Equal(uint64(2933))
-	Expect(b.ReadUint32()).To.Equal(uint32(10))
+	Expect(b.ReadUint64()).To.Equal(uint64(2933), nil)
+	Expect(b.ReadUint32()).To.Equal(uint32(10), nil)
 	b.WriteUint16(1234)
-	Expect(b.ReadUint16()).To.Equal(uint16(1234))
+	Expect(b.ReadUint16()).To.Equal(uint16(1234), nil)
 	b.WriteUint64(94994949)
-	Expect(b.ReadUint64()).To.Equal(uint64(94994949))
+	Expect(b.ReadUint64()).To.Equal(uint64(94994949), nil)
+}
+
+func (_ BytesTest) ReadIntsEOF() {
+	p := New(4, 1)
+	b := p.Checkout()
+	Expect(b.ReadUint64()).To.Equal(uint64(0), io.EOF)
+	Expect(b.ReadUint32()).To.Equal(uint32(0), io.EOF)
+	Expect(b.ReadUint16()).To.Equal(uint16(0), io.EOF)
+}
+
+func (_ BytesTest) ReadIntsEOFBuffer() {
+	p := New(4, 1)
+	b := p.Checkout()
+	b.WriteUint64(23)
+	b.ReadUint64()
+	Expect(b.ReadUint64()).To.Equal(uint64(0), io.EOF)
+	Expect(b.ReadUint32()).To.Equal(uint32(0), io.EOF)
+	Expect(b.ReadUint16()).To.Equal(uint16(0), io.EOF)
+}
+
+func (_ BytesTest) ReadAndWriteByte() {
+	p := New(3, 1)
+	b := p.Checkout()
+	b.WriteByte(9)
+	b.WriteByte(4)
+	Expect(b.ReadByte()).To.Equal(byte(9), nil)
+	Expect(b.ReadByte()).To.Equal(byte(4), nil)
+	Expect(b.ReadByte()).To.Equal(byte(0), io.EOF)
+}
+
+func (_ BytesTest) ReadAndWriteByteForBuffer() {
+	p := New(2, 1)
+	b := p.Checkout()
+	b.WriteByte(9)
+	b.WriteByte(4)
+	b.WriteByte(39)
+	Expect(b.ReadByte()).To.Equal(byte(9), nil)
+	Expect(b.ReadByte()).To.Equal(byte(4), nil)
+	Expect(b.ReadByte()).To.Equal(byte(39), nil)
+	Expect(b.ReadByte()).To.Equal(byte(0), io.EOF)
 }
 
 func (_ BytesTest) PositionFixed() {

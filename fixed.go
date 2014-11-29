@@ -97,6 +97,15 @@ func (f *fixed) Read(data []byte) (int, error) {
 	return n, nil
 }
 
+func (f *fixed) ReadByte() (byte, error) {
+	if f.r == f.length {
+		return 0, io.EOF
+	}
+	b := f.bytes[f.r]
+	f.r += 1
+	return b, nil
+}
+
 func (f *fixed) toBuffer() *buffer {
 	if f.onExpand != nil {
 		f.onExpand()

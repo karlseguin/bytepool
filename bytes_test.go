@@ -148,32 +148,32 @@ func (_ BytesTest) ResetFromExpansion() {
 func (_ BytesTest) WriteBigEndian() {
 	p := New(10, 1)
 	b := p.Checkout()
-	b.PutUint64(2933)
+	b.WriteUint64(2933)
 	Expect(b.Bytes()).To.Equal([]byte{0, 0, 0, 0, 0, 0, 11, 117})
-	b.PutUint32(8484848)
+	b.WriteUint32(8484848)
 	Expect(b.Bytes()).To.Equal([]byte{0, 0, 0, 0, 0, 0, 11, 117, 0, 129, 119, 240})
 }
 
 func (_ BytesTest) WriteLittleEndian() {
 	p := NewEndian(10, 1, binary.LittleEndian)
 	b := p.Checkout()
-	b.PutUint64(2933)
+	b.WriteUint64(2933)
 	Expect(b.Bytes()).To.Equal([]byte{117, 11, 0, 0, 0, 0, 0, 0})
-	b.PutUint32(8484848)
+	b.WriteUint32(8484848)
 	Expect(b.Bytes()).To.Equal([]byte{117, 11, 0, 0, 0, 0, 0, 0, 240, 119, 129, 0})
 }
 
 func (_ BytesTest) ReadBigEndian() {
 	p := New(12, 1)
 	b := p.Checkout()
-	b.PutUint64(2933)
-	b.PutUint32(10)
-	Expect(b.Uint64()).To.Equal(uint64(2933))
-	Expect(b.Uint32()).To.Equal(uint32(10))
-	b.PutUint16(1234)
-	Expect(b.Uint16()).To.Equal(uint16(1234))
-	b.PutUint64(94994949)
-	Expect(b.Uint64()).To.Equal(uint64(94994949))
+	b.WriteUint64(2933)
+	b.WriteUint32(10)
+	Expect(b.ReadUint64()).To.Equal(uint64(2933))
+	Expect(b.ReadUint32()).To.Equal(uint32(10))
+	b.WriteUint16(1234)
+	Expect(b.ReadUint16()).To.Equal(uint16(1234))
+	b.WriteUint64(94994949)
+	Expect(b.ReadUint64()).To.Equal(uint64(94994949))
 }
 
 func (_ BytesTest) PositionFixed() {

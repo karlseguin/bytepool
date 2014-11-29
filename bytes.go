@@ -62,22 +62,22 @@ func (b *Bytes) WriteByte(d byte) (err error) {
 	return err
 }
 
-func (b *Bytes) PutUint16(n uint16) {
+func (b *Bytes) WriteUint16(n uint16) {
 	b.enc.PutUint16(b.scratch, n)
 	b.bytes, _, _ = b.write(b.scratch[:2])
 }
 
-func (b *Bytes) PutUint32(n uint32) {
+func (b *Bytes) WriteUint32(n uint32) {
 	b.enc.PutUint32(b.scratch, n)
 	b.bytes, _, _ = b.write(b.scratch[:4])
 }
 
-func (b *Bytes) PutUint64(n uint64) {
+func (b *Bytes) WriteUint64(n uint64) {
 	b.enc.PutUint64(b.scratch, n)
 	b.bytes, _, _ = b.write(b.scratch[:8])
 }
 
-func (b *Bytes) Uint16() uint16 {
+func (b *Bytes) ReadUint16() uint16 {
 	n, _ := b.bytes.Read(b.scratch[:2])
 	if n == 2 {
 		return b.enc.Uint16(b.scratch)
@@ -85,7 +85,7 @@ func (b *Bytes) Uint16() uint16 {
 	return 0
 }
 
-func (b *Bytes) Uint32() uint32 {
+func (b *Bytes) ReadUint32() uint32 {
 	n, _ := b.bytes.Read(b.scratch[:4])
 	if n == 4 {
 		return b.enc.Uint32(b.scratch)
@@ -93,7 +93,7 @@ func (b *Bytes) Uint32() uint32 {
 	return 0
 }
 
-func (b *Bytes) Uint64() uint64 {
+func (b *Bytes) ReadUint64() uint64 {
 	n, _ := b.bytes.Read(b.scratch[:8])
 	if n == 8 {
 		return b.enc.Uint64(b.scratch)

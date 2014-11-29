@@ -52,10 +52,12 @@ You can call the `Expanded()` method for a count of how often items were forced 
 * `Position(n uint)` - Moves to the specified absolute position. This will grow the buffer if needed.
 
 ## Numeric Encoding
-The `PutUint16`, `PutUint32` and `PutUint64` methods can be used to write integers
+The `WriteUint16`, `WriteUint32` and `WriteUint64` methods can be used to write integers
 in big endian.
 
 To write using little endian, create a pool using `NewEndian` or an individual item using `NewEndianBytes` and pass the `binary.LittleEndian` object from the stdlib "encoding/binary" package.
+
+Corresponding `ReadUint16`, `ReadUint32` and `ReadUint64` are availabl. They return `(n, error)` where error will be `io.EOF` if not enough data is available.
 
 # Each
 It's possible to pre-fill byte items within the pool through the use of the pool's `Each` and the item's `Position` functions. You have to take special care to properly `Position` the item on each checkout.
@@ -69,13 +71,13 @@ For example, say we were writing into a buffer where bytes 4-8 were always the v
 pool := bytepool.New(256, 10)
 pool.Each(func(b *bytepool.Bytes) {
   b.Position(4)
-  b.PutInt32(30)
+  b.WriteInt32(30)
 })
 
 
 // code that uses the buffer
 bytes := pool.Checkout()
-bytes.PutInt32(size) //write into bytes[0:4]
+bytes.WriteInt32(size) //write into bytes[0:4]
 bytes.Position(8)    //skip bytes[4:8] which we already filled
 //continue
 ```

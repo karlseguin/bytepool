@@ -77,7 +77,7 @@ func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error
 		read += r
 		f.length += r
 		if err == io.EOF || (expected != 0 && read == ex) {
-			return f, int64(read), nil
+			return f, int64(read), err
 		}
 		if err != nil {
 			return f, int64(read), err

@@ -237,3 +237,15 @@ func (_ BytesTest) PositionBuffer() {
 	bytes.Position(5)
 	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49})
 }
+
+func (_ BytesTest) CustomOnExpand() {
+	expanded := 0
+	bytes := NewBytes(7)
+	bytes.SetOnExpand(func() { expanded++ })
+	bytes.WriteString("hello")
+	Expect(expanded).To.Equal(0)
+	bytes.WriteString("world")
+	Expect(expanded).To.Equal(1)
+	bytes.WriteString("world")
+	Expect(expanded).To.Equal(1)
+}

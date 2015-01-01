@@ -51,6 +51,13 @@ func newPooled(pool *Pool, capacity int, enc binary.ByteOrder) *Bytes {
 	return b
 }
 
+// Set a custom OnExpand callback (overwriting the one already set).
+// Only useful for when NewBytes is called directly as opposed
+// to through the pool.
+func (b *Bytes) SetOnExpand(callback func()) {
+	b.fixed.onExpand = callback
+}
+
 // Write the bytes
 func (b *Bytes) Write(data []byte) (n int, err error) {
 	b.bytes, n, err = b.write(data)

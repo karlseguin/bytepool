@@ -3,9 +3,10 @@ package bytepool
 import (
 	stdbytes "bytes"
 	"encoding/binary"
-	. "github.com/karlseguin/expect"
 	"io"
 	"testing"
+
+	. "github.com/karlseguin/expect"
 )
 
 type BytesTest struct{}
@@ -226,6 +227,17 @@ func (_ BytesTest) PositionFixed() {
 	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 4})
 }
 
+func (_ BytesTest) NegativePositionFixed() {
+	bytes := NewBytes(10)
+	bytes.WriteString("abc")
+	bytes.Position(2)
+	bytes.WriteString("bd")
+	Expect(bytes.Bytes()).To.Equal([]byte{97, 98, 98, 100})
+	bytes.Position(1)
+	bytes.WriteByte(4)
+	Expect(bytes.Bytes()).To.Equal([]byte{97, 4})
+}
+
 func (_ BytesTest) PositionBuffer() {
 	bytes := NewBytes(2)
 	bytes.Position(4)
@@ -236,6 +248,17 @@ func (_ BytesTest) PositionBuffer() {
 	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49, 50, 0, 0, 0, 0})
 	bytes.Position(5)
 	Expect(bytes.Bytes()).To.Equal([]byte{0, 0, 0, 0, 49})
+}
+
+func (_ BytesTest) NegativePositionBuffer() {
+	bytes := NewBytes(2)
+	bytes.WriteString("abc")
+	bytes.Position(2)
+	bytes.WriteString("bd")
+	Expect(bytes.Bytes()).To.Equal([]byte{97, 98, 98, 100})
+	bytes.Position(1)
+	bytes.WriteByte(4)
+	Expect(bytes.Bytes()).To.Equal([]byte{97, 4})
 }
 
 func (_ BytesTest) CustomOnExpand() {

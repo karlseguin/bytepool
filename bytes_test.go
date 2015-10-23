@@ -92,6 +92,16 @@ func (_ BytesTest) ReadFrom() {
 	Expect(bytes.String()).To.Equal("helloworldhowgoes")
 }
 
+func (_ BytesTest) WritesTo() {
+	bytes := NewBytes(10)
+	bytes.WriteString("over 9000")
+	buffer := new(stdbytes.Buffer)
+	bytes.WriteTo(buffer)
+	Expect(bytes.Len()).To.Equal(0)
+	Expect(bytes.fixed.r).To.Equal(0)
+	Expect(buffer.String()).To.Equal("over 9000")
+}
+
 func (_ BytesTest) ReadNFrom() {
 	bytes := NewBytes(10)
 	bytes.ReadNFrom(4, stdbytes.NewBufferString("hello"))

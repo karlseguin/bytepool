@@ -6,16 +6,17 @@ import (
 )
 
 type bytes interface {
-	write(b []byte) (bytes, int, error)
-	writeByte(b byte) (bytes, error)
-	readNFrom(n int64, r io.Reader) (bytes, int64, error)
 	position(n uint) bytes
+	writeByte(b byte) (bytes, error)
+	write(b []byte) (bytes, int, error)
+	readNFrom(n int64, r io.Reader) (bytes, int64, error)
 
-	ReadByte() (byte, error)
-	Read(b []byte) (int, error)
+	Len() int
 	Bytes() []byte
 	String() string
-	Len() int
+	ReadByte() (byte, error)
+	Read(b []byte) (int, error)
+	WriteTo(w io.Writer) (int64, error)
 }
 
 type Bytes struct {
@@ -136,7 +137,7 @@ func (b *Bytes) Position(n uint) {
 
 // Reset the object without releasing it
 func (b *Bytes) Reset() {
-	b.fixed.length, b.fixed.r = 0, 0
+	b.fixed.reset()
 	b.bytes = b.fixed
 }
 

@@ -85,6 +85,20 @@ func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error
 	}
 }
 
+func (f *fixed) WriteTo(w io.Writer) (int64, error) {
+	var at int64
+	l := int64(f.length)
+	for at < l {
+		n, err := w.Write(f.bytes[at:l])
+		at += int64(n)
+		if err != nil {
+			return at, err
+		}
+	}
+	f.reset()
+	return at, nil
+}
+
 func (f *fixed) Read(data []byte) (int, error) {
 	if f.r == f.length {
 		return 0, io.EOF
@@ -121,4 +135,9 @@ func (f *fixed) hasSpace(toAdd int) bool {
 
 func (f *fixed) full() bool {
 	return f.length == f.capacity
+}
+
+func (f *fixed) reset() {
+	f.r = 0
+	f.length = 0
 }

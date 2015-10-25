@@ -85,18 +85,19 @@ func (f *fixed) readNFrom(expected int64, reader io.Reader) (bytes, int64, error
 	}
 }
 
-func (f *fixed) WriteTo(w io.Writer) (int64, error) {
-	var at int64
-	l := int64(f.length)
-	for at < l {
-		n, err := w.Write(f.bytes[at:l])
-		at += int64(n)
+func (f *fixed) WriteTo(w io.Writer) (n int64, err error) {
+	r := f.r
+	l := f.length
+	for r < l {
+		n, err := w.Write(f.bytes[r:l])
 		if err != nil {
-			return at, err
+			break
 		}
+		r += n
 	}
 	f.reset()
-	return at, nil
+	f.r += int(n)
+	return n, err
 }
 
 func (f *fixed) Read(data []byte) (int, error) {
